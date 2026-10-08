@@ -1,0 +1,487 @@
+/* ==========================================================================
+   Sistem Ujian Online SMP & Bank Soal Multi-Format
+   Custom Stylesheet (Modern, Clean, Responsive, Accessibility-focused)
+   ========================================================================== */
+
+:root {
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-soft: #eff6ff;
+  --secondary-color: #475569;
+  --dark-navy: #0f172a;
+  --slate-header: #1e293b;
+  --success-color: #10b981;
+  --success-soft: #ecfdf5;
+  --warning-color: #f59e0b;
+  --warning-soft: #fffbeb;
+  --danger-color: #ef4444;
+  --danger-soft: #fef2f2;
+  --body-bg: #f8fafc;
+  --card-border: #e2e8f0;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --card-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--body-bg);
+  color: #334155;
+  min-height: 100vh;
+}
+
+/* Navbar & Brand */
+.navbar-custom {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-bottom: 2px solid #3b82f6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.brand-badge {
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(147, 197, 253, 0.3);
+  color: #93c5fd;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Hero & Glass Cards */
+.hero-card {
+  background: #ffffff;
+  border-radius: 1rem;
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow-lg);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-header-styled {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 1px solid var(--card-border);
+  padding: 1.25rem 1.5rem;
+}
+
+/* Feature Item in Index */
+.feature-badge-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: #f8fafc;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+.feature-badge-item:hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  transform: translateY(-2px);
+}
+.feature-icon-wrapper {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+/* Form Styles */
+.form-floating > .form-control:focus,
+.form-floating > .form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.15);
+}
+
+.input-token-box {
+  letter-spacing: 0.35em;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   Exam Engine Styles
+   ========================================================================== */
+
+/* Anti-Cheating & Text Protection */
+.secure-exam-zone {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Watermark Background on Exam Screen */
+.exam-watermark {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.035;
+  background-image: repeating-linear-gradient(
+    45deg,
+    #0f172a 0,
+    #0f172a 120px,
+    transparent 120px,
+    transparent 240px
+  );
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-around;
+  overflow: hidden;
+}
+.exam-watermark-text {
+  transform: rotate(-30deg);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0f172a;
+  padding: 3rem;
+  white-space: nowrap;
+}
+
+/* Top Sticky Exam Status Bar */
+.exam-status-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+  background: #0f172a;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.timer-pill {
+  background: #1e293b;
+  border: 1px solid #334155;
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 1.35rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.timer-pill.warning {
+  background: #78350f;
+  border-color: #f59e0b;
+  color: #fef3c7;
+}
+
+.timer-pill.danger {
+  background: #7f1d1d;
+  border-color: #ef4444;
+  color: #fee2e2;
+  animation: pulse-danger 1s infinite alternate;
+}
+
+@keyframes pulse-danger {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  100% { transform: scale(1.04); box-shadow: 0 0 12px 2px rgba(239, 68, 68, 0.8); }
+}
+
+/* Question Area */
+.question-card {
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 1rem;
+  box-shadow: var(--card-shadow);
+  position: relative;
+  z-index: 1;
+}
+
+/* Typography adjustment for questions */
+.font-size-sm .question-text { font-size: 1rem; }
+.font-size-md .question-text { font-size: 1.125rem; }
+.font-size-lg .question-text { font-size: 1.25rem; }
+
+.font-size-sm .option-text { font-size: 0.95rem; }
+.font-size-md .option-text { font-size: 1.05rem; }
+.font-size-lg .option-text { font-size: 1.15rem; }
+
+/* Option Cards (A, B, C, D) */
+.option-item {
+  border: 2px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 0.85rem 1.15rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: #ffffff;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.option-item:hover {
+  border-color: #93c5fd;
+  background-color: #f8fafc;
+  transform: translateX(4px);
+}
+
+.option-item.selected {
+  border-color: #2563eb;
+  background-color: #eff6ff;
+  box-shadow: 0 4px 8px -2px rgba(37, 99, 235, 0.15);
+}
+
+.option-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  font-weight: 700;
+  color: #475569;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.option-item.selected .option-key {
+  background-color: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+/* Question Navigation Matrix */
+.nav-question-matrix {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+  max-height: 360px;
+  overflow-y: auto;
+  padding: 0.35rem;
+}
+
+.btn-qnum {
+  font-weight: 600;
+  font-size: 0.875rem;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  position: relative;
+  transition: all 0.15s ease;
+  border: 2px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #334155;
+}
+
+.btn-qnum:hover {
+  border-color: #2563eb;
+  background-color: #eff6ff;
+  color: #1d4ed8;
+}
+
+/* Active current question */
+.btn-qnum.active-question {
+  border-color: #1e293b !important;
+  box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.25);
+  font-weight: 800;
+}
+
+/* Status variants */
+.btn-qnum.answered {
+  background-color: #10b981;
+  border-color: #059669;
+  color: #ffffff;
+}
+
+.btn-qnum.doubtful {
+  background-color: #f59e0b;
+  border-color: #d97706;
+  color: #ffffff;
+}
+
+.btn-qnum.doubtful::after {
+  content: "?";
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #b45309;
+  color: #fff;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Code Snippet Box with Prism.js */
+.code-container {
+  margin: 1rem 0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid #334155;
+}
+
+.code-header {
+  background-color: #1e293b;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #334155;
+}
+
+.code-badge {
+  font-family: monospace;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  background-color: #3b82f6;
+  color: #ffffff;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.code-container pre[class*="language-"] {
+  margin: 0;
+  border-radius: 0;
+  background-color: #0f172a !important;
+  font-size: 0.95rem;
+  max-height: 380px;
+}
+
+/* Warning Modal Shake Animation */
+@keyframes shakeWarning {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+  20%, 40%, 60%, 80% { transform: translateX(8px); }
+}
+
+.modal-shake .modal-dialog {
+  animation: shakeWarning 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* Violation counter badge */
+.violation-pill {
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #f87171;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ==========================================================================
+   Admin Dashboard Styles
+   ========================================================================== */
+.admin-sidebar-nav .nav-link {
+  color: #475569;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 0.25rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-sidebar-nav .nav-link:hover {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+.admin-sidebar-nav .nav-link.active {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.25);
+}
+
+/* Drag and Drop Zone */
+.dropzone-area {
+  border: 2px dashed #94a3b8;
+  border-radius: 1rem;
+  background-color: #f8fafc;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dropzone-area:hover,
+.dropzone-area.dragover {
+  border-color: var(--primary-color);
+  background-color: #eff6ff;
+  transform: scale(1.01);
+}
+
+.dropzone-icon {
+  font-size: 3.5rem;
+  color: #3b82f6;
+  margin-bottom: 0.75rem;
+}
+
+/* Table Preview Styling */
+.table-preview-container {
+  max-height: 480px;
+  overflow-y: auto;
+  border: 1px solid var(--card-border);
+  border-radius: 0.75rem;
+}
+
+.badge-valid {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 9999px;
+}
+
+.badge-invalid {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 9999px;
+}
+
+/* Printable Exam Card */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .no-print,
+  .exam-status-bar,
+  .btn,
+  .navbar-custom {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .card {
+    border: 1px solid #000 !important;
+    box-shadow: none !important;
+  }
+}
+
+.print-only {
+  display: none;
+}

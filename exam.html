@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lembar Ujian Online - Sistem CBT SMP</title>
+  <meta name="description" content="Engine Ujian Online SMP dengan proteksi anti-curang dan syntax highlighting koding.">
+
+  <!-- Bootstrap 5 CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome 6 CDN -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <!-- Prism.js CSS CDN (Tomorrow Dark Theme + Line Numbers) -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet">
+  <!-- Custom Stylesheet -->
+  <link href="css/style.css" rel="stylesheet">
+</head>
+<body class="secure-exam-zone bg-light">
+
+  <!-- Watermark Background -->
+  <div class="exam-watermark" id="examWatermark" aria-hidden="true"></div>
+
+  <!-- Top Fixed Exam Status Bar -->
+  <header class="exam-status-bar py-2">
+    <div class="container-fluid px-3 px-md-4">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        
+        <!-- Left: Student & Subject Identity -->
+        <div class="d-flex align-items-center gap-3">
+          <div class="d-none d-sm-flex align-items-center justify-content-center bg-primary text-white rounded-circle shadow-sm" style="width: 40px; height: 40px;">
+            <i class="fas fa-user-graduate"></i>
+          </div>
+          <div>
+            <div class="d-flex align-items-center gap-2">
+              <span id="displayStudentName" class="fw-bold fs-6 text-white text-truncate" style="max-width: 220px;">Siswa</span>
+              <span id="displayGradeBadge" class="badge bg-primary-subtle text-primary border border-primary-subtle small">Kelas -</span>
+            </div>
+            <div class="small text-secondary-subtle d-flex align-items-center gap-2">
+              <span id="displaySubjectName" class="text-info fw-semibold">Mapel</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center: Countdown Timer -->
+        <div class="d-flex align-items-center gap-2 mx-auto mx-md-0 order-3 order-md-2">
+          <div id="timerContainer" class="timer-pill">
+            <i class="far fa-clock"></i>
+            <span id="timerDisplay">60:00</span>
+          </div>
+        </div>
+
+        <!-- Right: Actions & Cheating Indicator -->
+        <div class="d-flex align-items-center gap-2 order-2 order-md-3">
+          <div id="violationCounterBadge" class="violation-pill d-none">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Peringatan: <strong id="violationCountText">0/3</strong></span>
+          </div>
+
+          <button id="btnToggleFullscreen" class="btn btn-sm btn-outline-light d-none d-md-inline-flex align-items-center gap-1" title="Layar Penuh">
+            <i class="fas fa-expand"></i> <span>Fullscreen</span>
+          </button>
+
+          <!-- Offcanvas Toggle for Question Matrix on Mobile -->
+          <button class="btn btn-sm btn-primary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#navMatrixOffcanvas">
+            <i class="fas fa-th"></i> Daftar Soal
+          </button>
+        </div>
+
+      </div>
+    </div>
+    
+    <!-- Thin Progress Bar for Exam Timer -->
+    <div class="progress" style="height: 3px; border-radius: 0; background-color: rgba(255,255,255,0.1);">
+      <div id="timerProgressBar" class="progress-bar bg-primary" role="progressbar" style="width: 100%;"></div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="container-fluid px-3 px-md-4 py-4">
+    <div class="row g-4">
+      
+      <!-- Left Column: Active Question Workspace -->
+      <div class="col-lg-8 col-xl-9">
+        <div class="question-card p-3 p-md-4 font-size-md" id="questionCardWrapper">
+          
+          <!-- Question Header: Number & Font Resizer -->
+          <div class="d-flex align-items-center justify-content-between border-bottom pb-3 mb-3">
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge bg-dark fs-6 px-3 py-2 rounded-3">
+                Soal Nomor <span id="currentQuestionNum">1</span> dari <span id="totalQuestionsNum">1</span>
+              </span>
+              <span id="doubtfulStatusBadge" class="badge bg-warning text-dark d-none">
+                <i class="fas fa-question-circle"></i> Ragu-Ragu
+              </span>
+            </div>
+
+            <div class="d-flex align-items-center gap-1">
+              <span class="text-muted small me-2 d-none d-sm-inline">Ukuran Huruf:</span>
+              <button class="btn btn-sm btn-outline-secondary px-2 py-0" id="btnFontDecrease" title="Perkecil Teks">A-</button>
+              <button class="btn btn-sm btn-outline-secondary px-2 py-0" id="btnFontReset" title="Ukuran Normal">A</button>
+              <button class="btn btn-sm btn-outline-secondary px-2 py-0" id="btnFontIncrease" title="Perbesar Teks">A+</button>
+            </div>
+          </div>
+
+          <!-- Question Prompt Text -->
+          <div class="question-text fw-medium text-dark mb-3 lh-base" id="questionText">
+            Memuat butir pertanyaan...
+          </div>
+
+          <!-- Code Snippet Area (Prism.js Highlighted) -->
+          <div id="codeSnippetWrapper" class="code-container d-none">
+            <div class="code-header">
+              <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-code text-info"></i>
+                <span id="codeLangBadge" class="code-badge">CODE</span>
+              </div>
+              <button class="btn btn-xs btn-outline-light text-secondary-subtle py-0 px-2" id="btnCopyCode" title="Salin Kode">
+                <i class="far fa-copy"></i>
+              </button>
+            </div>
+            <pre class="line-numbers"><code id="codeSnippet" class="language-javascript"></code></pre>
+          </div>
+
+          <!-- Options Area (A, B, C, D) -->
+          <div class="options-container d-flex flex-column gap-2 mt-4" id="optionsContainer">
+            <!-- Dynamically populated options -->
+          </div>
+
+          <!-- Navigation Footer Buttons -->
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-4 mt-4 border-top">
+            <button id="btnPrevQuestion" class="btn btn-outline-secondary px-3 py-2 fw-semibold">
+              <i class="fas fa-arrow-left me-1"></i> Soal Sebelumnya
+            </button>
+
+            <button id="btnToggleDoubtful" class="btn btn-outline-warning text-dark px-3 py-2 fw-semibold">
+              <i class="far fa-flag me-1"></i> <span id="doubtfulBtnText">Tandai Ragu-Ragu</span>
+            </button>
+
+            <div class="d-flex gap-2">
+              <button id="btnNextQuestion" class="btn btn-primary px-4 py-2 fw-semibold">
+                Soal Berikutnya <i class="fas fa-arrow-right ms-1"></i>
+              </button>
+
+              <button id="btnOpenSubmitModal" class="btn btn-success px-4 py-2 fw-bold d-none">
+                <i class="fas fa-check-double me-1"></i> Selesaikan Ujian
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Right Column (Desktop): Question Matrix Navigation -->
+      <div class="col-lg-4 col-xl-3 d-none d-lg-block">
+        <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top: 80px;">
+          <div class="card-header bg-white border-bottom py-3">
+            <h6 class="fw-bold mb-0 text-dark d-flex align-items-center justify-content-between">
+              <span><i class="fas fa-th text-primary me-2"></i>Nomor Soal</span>
+              <span id="answeredSummaryBadge" class="badge bg-secondary-subtle text-dark border">0 Terjawab</span>
+            </h6>
+          </div>
+
+          <div class="card-body p-3">
+            <!-- Navigation Matrix -->
+            <div class="nav-question-matrix mb-3" id="desktopNavMatrix">
+              <!-- Dynamically populated buttons -->
+            </div>
+
+            <!-- Legend Info -->
+            <div class="p-2 bg-light rounded-3 small border">
+              <div class="d-flex align-items-center justify-content-between mb-1">
+                <span class="d-flex align-items-center gap-2">
+                  <span class="badge bg-success" style="width: 14px; height: 14px; padding: 0;"> </span>
+                  Sudah Dijawab
+                </span>
+                <strong id="countAnswered">0</strong>
+              </div>
+              <div class="d-flex align-items-center justify-content-between mb-1">
+                <span class="d-flex align-items-center gap-2">
+                  <span class="badge bg-warning" style="width: 14px; height: 14px; padding: 0;"> </span>
+                  Ragu-Ragu
+                </span>
+                <strong id="countDoubtful">0</strong>
+              </div>
+              <div class="d-flex align-items-center justify-content-between">
+                <span class="d-flex align-items-center gap-2">
+                  <span class="badge bg-light border text-dark" style="width: 14px; height: 14px; padding: 0;"> </span>
+                  Belum Dijawab
+                </span>
+                <strong id="countUnanswered">0</strong>
+              </div>
+            </div>
+
+            <!-- Big Finish Button -->
+            <div class="d-grid mt-3">
+              <button id="btnSidebarFinish" class="btn btn-danger fw-bold py-2 shadow-sm">
+                <i class="fas fa-file-upload me-2"></i> Selesaikan Ujian
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Mobile Offcanvas Question Matrix -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="navMatrixOffcanvas" aria-labelledby="navMatrixOffcanvasLabel">
+    <div class="offcanvas-header bg-dark text-white">
+      <h5 class="offcanvas-title fw-bold" id="navMatrixOffcanvasLabel">
+        <i class="fas fa-th text-primary me-2"></i> Daftar Nomor Soal
+      </h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body p-3">
+      <div class="nav-question-matrix mb-3" id="mobileNavMatrix">
+        <!-- Dynamically populated buttons -->
+      </div>
+      <div class="d-grid mt-4">
+        <button id="btnMobileFinish" class="btn btn-danger fw-bold py-2">
+          <i class="fas fa-file-upload me-2"></i> Selesaikan Ujian
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Anti-Cheating Violation Warning Modal -->
+  <div class="modal fade modal-shake" id="cheatingWarningModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-2xl rounded-4">
+        <div class="modal-header bg-danger text-white border-0 py-3">
+          <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+            <i class="fas fa-exclamation-triangle fa-shake"></i> PERINGATAN PELANGGARAN UJIAN!
+          </h5>
+        </div>
+        <div class="modal-body p-4 text-center">
+          <div class="my-3">
+            <i class="fas fa-user-secret fa-4x text-danger mb-3"></i>
+            <h5 class="fw-bold text-dark" id="violationWarningTitle">Anda Terdeteksi Meninggalkan Layar Ujian!</h5>
+            <p class="text-secondary small mb-3">
+              Sistem mencatat aktivitas perpindahan tab, aplikasi, atau kehilangan fokus jendela.
+            </p>
+            <div class="alert alert-danger py-2 fw-bold" id="violationWarningText">
+              Peringatan ke-1 dari batas maksimal 3 kali.
+            </div>
+            <p class="text-muted small mb-0">
+              Jika mencapai 3 kali pelanggaran, lembar jawaban Anda akan <strong>dikunci dan dikirimkan secara otomatis</strong> dengan status pelanggaran integritas.
+            </p>
+          </div>
+        </div>
+        <div class="modal-footer bg-light border-0 py-3">
+          <button type="button" class="btn btn-danger w-100 fw-bold py-2" id="btnDismissWarning">
+            <i class="fas fa-check-circle me-1"></i> Saya Paham dan Kembali Mengerjakan
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exam Submission Confirmation Modal -->
+  <div class="modal fade" id="submitConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header bg-primary text-white border-0 py-3">
+          <h5 class="modal-title fw-bold">
+            <i class="fas fa-question-circle me-2"></i> Konfirmasi Pengumpulan Ujian
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <p class="text-secondary mb-3">
+            Apakah Anda yakin ingin mengakhiri sesi ujian ini? Periksa kembali ringkasan lembar jawaban Anda:
+          </p>
+          <div class="list-group mb-3">
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+              <span><i class="fas fa-check-circle text-success me-2"></i>Soal Sudah Dijawab</span>
+              <span class="badge bg-success rounded-pill fs-6" id="modalCountAnswered">0</span>
+            </div>
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+              <span><i class="fas fa-flag text-warning me-2"></i>Soal Masih Ragu-Ragu</span>
+              <span class="badge bg-warning text-dark rounded-pill fs-6" id="modalCountDoubtful">0</span>
+            </div>
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+              <span><i class="fas fa-times-circle text-secondary me-2"></i>Soal Belum Dijawab</span>
+              <span class="badge bg-danger rounded-pill fs-6" id="modalCountUnanswered">0</span>
+            </div>
+          </div>
+          <div class="alert alert-warning small mb-0">
+            <i class="fas fa-info-circle me-1"></i> Setelah diserahkan, lembar jawaban tidak dapat diubah kembali. Nilai Anda akan langsung dihitung.
+          </div>
+        </div>
+        <div class="modal-footer bg-light border-0 py-3">
+          <button type="button" class="btn btn-secondary px-3" data-bs-dismiss="modal">Kembali Mengerjakan</button>
+          <button type="button" class="btn btn-success fw-bold px-4" id="btnFinalSubmit">
+            <i class="fas fa-paper-plane me-1"></i> Ya, Kumpulkan Sekarang
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exam Completion Confirmation Modal (Siswa Tidak Bisa Melihat Hasil / Nilai) -->
+  <div class="modal fade" id="resultModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-2xl rounded-4">
+        
+        <!-- Header -->
+        <div class="modal-header bg-dark text-white border-0 py-3">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fas fa-shield-alt text-success fa-lg"></i>
+            <h5 class="modal-title fw-bold">Konfirmasi Pengumpulan Lembar Jawaban</h5>
+          </div>
+          <span class="badge bg-success px-3 py-2 rounded-pill">Selesai</span>
+        </div>
+
+        <div class="modal-body p-4 p-md-5">
+          <div class="text-center mb-4">
+            <div id="resultIcon" class="mb-3">
+              <i class="fas fa-check-circle fa-4x text-success"></i>
+            </div>
+            <h3 class="fw-bold text-dark mb-1" id="resultHeading">Lembar Jawaban Berhasil Dikumpulkan!</h3>
+            <p class="text-muted small" id="resultSubheading">Terima kasih telah mengikuti ujian dengan tertib dan jujur.</p>
+          </div>
+
+          <!-- Submission Confirmation Card -->
+          <div class="card border rounded-4 shadow-sm p-4 mb-4 bg-white" id="submissionSummaryCard">
+            <div class="text-center border-bottom pb-3 mb-3">
+              <h5 class="fw-bold mb-0 text-dark" id="cardSchoolName">SMP IT Bunayya Lhokseumawe</h5>
+              <div class="small text-muted">BUKTI PENGUMPULAN UJIAN BERBASIS KOMPUTER (CBT)</div>
+            </div>
+
+            <div class="row g-3 small mb-3">
+              <div class="col-12 col-md-6">
+                <span class="text-muted d-block">Nama Lengkap Siswa:</span>
+                <strong id="cardStudentName" class="fs-6 text-dark">-</strong>
+              </div>
+              <div class="col-6 col-md-6">
+                <span class="text-muted d-block">Tingkat Kelas:</span>
+                <strong id="cardStudentGrade" class="fs-6 text-dark">-</strong>
+              </div>
+              <div class="col-6 col-md-6">
+                <span class="text-muted d-block">Mata Pelajaran:</span>
+                <strong id="cardSubject" class="fs-6 text-primary">-</strong>
+              </div>
+              <div class="col-6 col-md-6">
+                <span class="text-muted d-block">Jenis Ujian:</span>
+                <strong id="cardExamType" class="fs-6 text-info">-</strong>
+              </div>
+            </div>
+
+            <div class="alert alert-light border d-flex justify-content-between align-items-center mb-0 p-3 rounded-3">
+              <div>
+                <span class="text-muted small d-block">Waktu Pengumpulan:</span>
+                <strong id="cardSubmitTime" class="small text-dark">-</strong>
+              </div>
+              <div>
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-6">
+                  <i class="fas fa-check-double me-1"></i> Terkirim & Tersimpan
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notice: Results only accessible by Teacher / Admin -->
+          <div class="alert alert-info border-0 rounded-3 py-2 px-3 small mb-3 text-center d-flex align-items-center justify-content-center gap-2">
+            <i class="fas fa-info-circle fa-lg text-primary"></i>
+            <span>Sesuai ketentuan, rekapitulasi nilai dan hasil ujian hanya dapat diakses oleh Guru / Administrator sekolah.</span>
+          </div>
+
+          <div class="text-center text-muted small mb-3">
+            Otomatis kembali ke halaman utama dalam <strong id="redirectCountdown" class="text-primary fs-6">8</strong> detik...
+          </div>
+
+          <!-- Action Button: Only Back to Home -->
+          <div class="d-grid gap-2">
+            <a href="index.html" class="btn btn-primary btn-lg fw-bold py-3 shadow-sm" id="btnReturnHome">
+              <i class="fas fa-home me-2"></i> Kembali ke Halaman Utama
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Prism.js + Syntax Highlighting components -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+  <script src="js/questions-data.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Validate Active Session
+      const session = ExamApp.Storage.getSession();
+      if (!session || !session.questions || session.questions.length === 0) {
+        alert('Sesi ujian tidak ditemukan atau telah berakhir. Mengalihkan ke halaman awal.');
+        window.location.href = 'index.html';
+        return;
+      }
+
+      const settings = ExamApp.Storage.getSettings();
+      const maxViolations = settings.maxViolations || 3;
+      let questions = session.questions;
+      let currentIndex = session.currentQuestionIndex || 0;
+      let answers = session.answers || {};
+      let doubtful = session.doubtful || {};
+      let violations = session.violations || 0;
+
+      // Timer calculation
+      const totalDurationSec = (session.durationMinutes || 60) * 60;
+      const elapsedSec = Math.floor((Date.now() - session.startTime) / 1000);
+      let remainingSec = Math.max(0, totalDurationSec - elapsedSec);
+
+      // DOM Elements
+      const displayStudentName = document.getElementById('displayStudentName');
+      const displayGradeBadge = document.getElementById('displayGradeBadge');
+      const displaySubjectName = document.getElementById('displaySubjectName');
+      const timerDisplay = document.getElementById('timerDisplay');
+      const timerContainer = document.getElementById('timerContainer');
+      const timerProgressBar = document.getElementById('timerProgressBar');
+      const examWatermark = document.getElementById('examWatermark');
+      const questionCardWrapper = document.getElementById('questionCardWrapper');
+
+      const currentQuestionNum = document.getElementById('currentQuestionNum');
+      const totalQuestionsNum = document.getElementById('totalQuestionsNum');
+      const doubtfulStatusBadge = document.getElementById('doubtfulStatusBadge');
+      const questionText = document.getElementById('questionText');
+      const codeSnippetWrapper = document.getElementById('codeSnippetWrapper');
+      const codeLangBadge = document.getElementById('codeLangBadge');
+      const codeSnippet = document.getElementById('codeSnippet');
+      const btnCopyCode = document.getElementById('btnCopyCode');
+      const optionsContainer = document.getElementById('optionsContainer');
+
+      const btnPrevQuestion = document.getElementById('btnPrevQuestion');
+      const btnNextQuestion = document.getElementById('btnNextQuestion');
+      const btnToggleDoubtful = document.getElementById('btnToggleDoubtful');
+      const doubtfulBtnText = document.getElementById('doubtfulBtnText');
+      const btnOpenSubmitModal = document.getElementById('btnOpenSubmitModal');
+      const btnSidebarFinish = document.getElementById('btnSidebarFinish');
+      const btnMobileFinish = document.getElementById('btnMobileFinish');
+
+      const desktopNavMatrix = document.getElementById('desktopNavMatrix');
+      const mobileNavMatrix = document.getElementById('mobileNavMatrix');
+      const answeredSummaryBadge = document.getElementById('answeredSummaryBadge');
+      const countAnswered = document.getElementById('countAnswered');
+      const countDoubtful = document.getElementById('countDoubtful');
+      const countUnanswered = document.getElementById('countUnanswered');
+
+      const violationCounterBadge = document.getElementById('violationCounterBadge');
+      const violationCountText = document.getElementById('violationCountText');
+      const cheatingWarningModalEl = document.getElementById('cheatingWarningModal');
+      const cheatingWarningModal = new bootstrap.Modal(cheatingWarningModalEl);
+      const btnDismissWarning = document.getElementById('btnDismissWarning');
+
+      const submitConfirmModal = new bootstrap.Modal(document.getElementById('submitConfirmModal'));
+      const btnFinalSubmit = document.getElementById('btnFinalSubmit');
+      const resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+
+      // Populate Header details
+      displayStudentName.textContent = session.studentName;
+      displayGradeBadge.textContent = 'Kelas ' + session.grade + ' SMP';
+      displaySubjectName.textContent = session.subject + ' (' + session.examType + ')';
+      totalQuestionsNum.textContent = questions.length;
+
+      // Generate Watermark
+      let wmText = `${session.studentName} • JANGAN MEMOTRET LAYAR`;
+      let wmHtml = '';
+      for (let i = 0; i < 18; i++) {
+        wmHtml += `<div class="exam-watermark-text">${wmText}</div>`;
+      }
+      examWatermark.innerHTML = wmHtml;
+
+      // =========================================================================
+      // TIMER ENGINE
+      // =========================================================================
+      let timerInterval = null;
+      let hasWarnedFiveMin = false;
+
+      function updateTimer() {
+        if (remainingSec <= 0) {
+          clearInterval(timerInterval);
+          timerDisplay.textContent = '00:00';
+          timerProgressBar.style.width = '0%';
+          ExamApp.AudioEngine.warning();
+          ExamApp.Toast.show('Waktu pengerjaan telah habis! Sistem mengirimkan lembar jawaban secara otomatis.', 'danger', 'Waktu Habis');
+          autoSubmitExam('Waktu Habis (Auto-Submit)');
+          return;
+        }
+
+        const mins = Math.floor(remainingSec / 60);
+        const secs = remainingSec % 60;
+        timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+        // Percentage for progress bar
+        const pct = (remainingSec / totalDurationSec) * 100;
+        timerProgressBar.style.width = `${pct}%`;
+
+        // Color coding
+        if (remainingSec <= 300) { // < 5 minutes
+          timerContainer.className = 'timer-pill danger';
+          timerProgressBar.className = 'progress-bar bg-danger';
+          if (!hasWarnedFiveMin) {
+            hasWarnedFiveMin = true;
+            ExamApp.AudioEngine.warning();
+            ExamApp.Toast.show('Waktu tersisa kurang dari 5 menit! Periksa kembali jawaban Anda.', 'danger', 'Perhatian');
+          }
+        } else if (remainingSec <= 900) { // < 15 minutes
+          timerContainer.className = 'timer-pill warning';
+          timerProgressBar.className = 'progress-bar bg-warning';
+        } else {
+          timerContainer.className = 'timer-pill';
+          timerProgressBar.className = 'progress-bar bg-primary';
+        }
+
+        remainingSec--;
+      }
+
+      timerInterval = setInterval(updateTimer, 1000);
+      updateTimer();
+
+      // =========================================================================
+      // ANTI-CHEATING PROTOCOL
+      // =========================================================================
+      let isWarningModalOpen = false;
+      let isExamFinished = false;
+
+      function handleCheatingViolation(reason = 'Pindah Tab / Kehilangan Fokus') {
+        if (isExamFinished || isWarningModalOpen) return;
+
+        violations++;
+        session.violations = violations;
+        ExamApp.Storage.saveSession(session);
+
+        ExamApp.AudioEngine.warning();
+
+        // Update violation badges
+        violationCounterBadge.classList.remove('d-none');
+        violationCountText.textContent = `${violations}/${maxViolations}`;
+
+        if (violations > maxViolations) {
+          // Auto submit on exceeding violation limit
+          autoSubmitExam('Pelanggaran Anti-Curang (Pindah Tab Melebihi Batas)');
+          return;
+        }
+
+        // Show warning modal
+        isWarningModalOpen = true;
+        document.getElementById('violationWarningTitle').textContent = `Pelanggaran Terdeteksi: ${reason}`;
+        document.getElementById('violationWarningText').innerHTML = 
+          `Peringatan <strong>${violations}</strong> dari maksimal <strong>${maxViolations}</strong> kali.<br>` +
+          (violations === maxViolations 
+            ? '<span class="text-danger fw-bold">PERINGATAN TERAKHIR! Pelanggaran berikutnya akan otomatis mengakhiri ujian Anda!</span>'
+            : 'Harap tetap berada di tab lembar ujian hingga selesai.');
+        
+        cheatingWarningModal.show();
+      }
+
+      btnDismissWarning.addEventListener('click', () => {
+        cheatingWarningModal.hide();
+        isWarningModalOpen = false;
+        ExamApp.AudioEngine.click();
+      });
+
+      // Detect visibility change (switching tabs or minimizing)
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden && !isExamFinished) {
+          handleCheatingViolation('Membuka Tab atau Aplikasi Lain');
+        }
+      });
+
+      // Detect window blur
+      window.addEventListener('blur', () => {
+        if (!isExamFinished && !isWarningModalOpen) {
+          handleCheatingViolation('Jendela Ujian Kehilangan Fokus');
+        }
+      });
+
+      // Disable Right Click (Context Menu)
+      document.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        ExamApp.Toast.show('Klik kanan dinonaktifkan demi keamanan integritas ujian!', 'warning');
+        return false;
+      });
+
+      // Disable Keyboard Shortcuts (Copy, Paste, Devtools, Print)
+      document.addEventListener('keydown', (e) => {
+        if (
+          (e.ctrlKey && ['c', 'v', 'u', 'p', 's', 'a'].includes(e.key.toLowerCase())) ||
+          e.key === 'F12' ||
+          (e.ctrlKey && e.shiftKey && ['i', 'j', 'c'].includes(e.key.toLowerCase()))
+        ) {
+          e.preventDefault();
+          ExamApp.AudioEngine.warning();
+          ExamApp.Toast.show('Pintasan keyboard dinonaktifkan!', 'warning');
+          return false;
+        }
+      });
+
+      // Fullscreen Toggle
+      const btnToggleFullscreen = document.getElementById('btnToggleFullscreen');
+      btnToggleFullscreen.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+          btnToggleFullscreen.innerHTML = '<i class="fas fa-compress"></i> <span>Normal</span>';
+        } else {
+          document.exitFullscreen().catch(() => {});
+          btnToggleFullscreen.innerHTML = '<i class="fas fa-expand"></i> <span>Fullscreen</span>';
+        }
+      });
+
+      // =========================================================================
+      // FONT RESIZER
+      // =========================================================================
+      document.getElementById('btnFontDecrease').addEventListener('click', () => {
+        questionCardWrapper.className = 'question-card p-3 p-md-4 font-size-sm';
+      });
+      document.getElementById('btnFontReset').addEventListener('click', () => {
+        questionCardWrapper.className = 'question-card p-3 p-md-4 font-size-md';
+      });
+      document.getElementById('btnFontIncrease').addEventListener('click', () => {
+        questionCardWrapper.className = 'question-card p-3 p-md-4 font-size-lg';
+      });
+
+      // Copy Code button
+      btnCopyCode.addEventListener('click', () => {
+        const text = codeSnippet.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+          ExamApp.Toast.show('Potongan kode berhasil disalin!', 'success');
+        });
+      });
+
+      // =========================================================================
+      // RENDER QUESTION & OPTIONS
+      // =========================================================================
+      function renderQuestion(index) {
+        if (index < 0 || index >= questions.length) return;
+        currentIndex = index;
+        session.currentQuestionIndex = currentIndex;
+        ExamApp.Storage.saveSession(session);
+
+        const q = questions[currentIndex];
+        currentQuestionNum.textContent = currentIndex + 1;
+
+        // Render question text
+        questionText.textContent = q.question;
+
+        // Render code snippet if available
+        if (q.code && q.code.trim().length > 0) {
+          codeSnippetWrapper.classList.remove('d-none');
+          const lang = q.lang || 'javascript';
+          codeLangBadge.textContent = lang.toUpperCase();
+          codeSnippet.className = `language-${lang}`;
+          codeSnippet.textContent = q.code;
+          Prism.highlightElement(codeSnippet);
+        } else {
+          codeSnippetWrapper.classList.add('d-none');
+          codeSnippet.textContent = '';
+        }
+
+        // Render Doubtful status
+        const isDoubt = !!doubtful[currentIndex];
+        if (isDoubt) {
+          doubtfulStatusBadge.classList.remove('d-none');
+          btnToggleDoubtful.className = 'btn btn-warning text-dark px-3 py-2 fw-semibold';
+          doubtfulBtnText.textContent = 'Hapus Tanda Ragu';
+        } else {
+          doubtfulStatusBadge.classList.add('d-none');
+          btnToggleDoubtful.className = 'btn btn-outline-warning text-dark px-3 py-2 fw-semibold';
+          doubtfulBtnText.textContent = 'Tandai Ragu-Ragu';
+        }
+
+        // Render Options (A, B, C, D)
+        const currentAnswer = answers[currentIndex];
+        let optionsHtml = '';
+        const optionKeys = ['A', 'B', 'C', 'D'];
+
+        optionKeys.forEach(optKey => {
+          const optText = q.options[optKey] || '';
+          if (!optText) return;
+          const isSelected = currentAnswer === optKey;
+
+          optionsHtml += `
+            <div class="option-item ${isSelected ? 'selected' : ''}" data-opt="${optKey}">
+              <div class="option-key">${optKey}</div>
+              <div class="option-text text-dark">${escapeHtml(optText)}</div>
+            </div>
+          `;
+        });
+
+        optionsContainer.innerHTML = optionsHtml;
+
+        // Attach option click listeners
+        document.querySelectorAll('.option-item').forEach(item => {
+          item.addEventListener('click', () => {
+            const chosen = item.getAttribute('data-opt');
+            selectOption(chosen);
+          });
+        });
+
+        // Navigation button visibility
+        btnPrevQuestion.disabled = (currentIndex === 0);
+        if (currentIndex === questions.length - 1) {
+          btnNextQuestion.classList.add('d-none');
+          btnOpenSubmitModal.classList.remove('d-none');
+        } else {
+          btnNextQuestion.classList.remove('d-none');
+          btnOpenSubmitModal.classList.add('d-none');
+        }
+
+        renderMatrix();
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      function selectOption(key) {
+        answers[currentIndex] = key;
+        session.answers = answers;
+        ExamApp.Storage.saveSession(session);
+        ExamApp.AudioEngine.click();
+
+        // Update active class in options
+        document.querySelectorAll('.option-item').forEach(item => {
+          if (item.getAttribute('data-opt') === key) {
+            item.classList.add('selected');
+          } else {
+            item.classList.remove('selected');
+          }
+        });
+
+        renderMatrix();
+      }
+
+      // Doubtful Toggle
+      btnToggleDoubtful.addEventListener('click', () => {
+        doubtful[currentIndex] = !doubtful[currentIndex];
+        if (!doubtful[currentIndex]) {
+          delete doubtful[currentIndex];
+        }
+        session.doubtful = doubtful;
+        ExamApp.Storage.saveSession(session);
+        ExamApp.AudioEngine.click();
+        renderQuestion(currentIndex);
+      });
+
+      // Navigation Buttons
+      btnPrevQuestion.addEventListener('click', () => {
+        if (currentIndex > 0) {
+          ExamApp.AudioEngine.click();
+          renderQuestion(currentIndex - 1);
+        }
+      });
+
+      btnNextQuestion.addEventListener('click', () => {
+        if (currentIndex < questions.length - 1) {
+          ExamApp.AudioEngine.click();
+          renderQuestion(currentIndex + 1);
+        }
+      });
+
+      // =========================================================================
+      // QUESTION MATRIX NAVIGATION
+      // =========================================================================
+      function renderMatrix() {
+        let desktopHtml = '';
+        let mobileHtml = '';
+        let answeredTotal = 0;
+        let doubtfulTotal = 0;
+
+        questions.forEach((q, idx) => {
+          const isAnswered = answers[idx] !== undefined && answers[idx] !== '';
+          const isDoubt = !!doubtful[idx];
+          const isCurrent = idx === currentIndex;
+
+          if (isAnswered) answeredTotal++;
+          if (isDoubt) doubtfulTotal++;
+
+          let statusClass = '';
+          if (isDoubt) {
+            statusClass = 'doubtful';
+          } else if (isAnswered) {
+            statusClass = 'answered';
+          }
+
+          if (isCurrent) {
+            statusClass += ' active-question';
+          }
+
+          const btnMarkup = `
+            <button class="btn-qnum ${statusClass}" data-index="${idx}" title="Nomor ${idx + 1}">
+              ${idx + 1}
+            </button>
+          `;
+
+          desktopHtml += btnMarkup;
+          mobileHtml += btnMarkup;
+        });
+
+        desktopNavMatrix.innerHTML = desktopHtml;
+        mobileNavMatrix.innerHTML = mobileHtml;
+
+        // Summary counts
+        const unansweredTotal = questions.length - answeredTotal;
+        answeredSummaryBadge.textContent = `${answeredTotal} / ${questions.length} Terjawab`;
+        countAnswered.textContent = answeredTotal;
+        countDoubtful.textContent = doubtfulTotal;
+        countUnanswered.textContent = unansweredTotal;
+
+        // Attach matrix button click
+        const attachClicks = (container) => {
+          container.querySelectorAll('.btn-qnum').forEach(b => {
+            b.addEventListener('click', () => {
+              const targetIdx = parseInt(b.getAttribute('data-index'), 10);
+              ExamApp.AudioEngine.click();
+              renderQuestion(targetIdx);
+              // Close offcanvas if mobile
+              const offcanvasEl = document.getElementById('navMatrixOffcanvas');
+              const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
+              if (bsOffcanvas) bsOffcanvas.hide();
+            });
+          });
+        };
+
+        attachClicks(desktopNavMatrix);
+        attachClicks(mobileNavMatrix);
+      }
+
+      // =========================================================================
+      // SUBMISSION & GRADING ENGINE
+      // =========================================================================
+      function openSubmitModal() {
+        let answeredTotal = Object.keys(answers).length;
+        let doubtfulTotal = Object.keys(doubtful).length;
+        let unansweredTotal = questions.length - answeredTotal;
+
+        document.getElementById('modalCountAnswered').textContent = answeredTotal;
+        document.getElementById('modalCountDoubtful').textContent = doubtfulTotal;
+        document.getElementById('modalCountUnanswered').textContent = unansweredTotal;
+
+        submitConfirmModal.show();
+      }
+
+      btnOpenSubmitModal.addEventListener('click', openSubmitModal);
+      btnSidebarFinish.addEventListener('click', openSubmitModal);
+      btnMobileFinish.addEventListener('click', () => {
+        const offcanvasEl = document.getElementById('navMatrixOffcanvas');
+        const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
+        if (bsOffcanvas) bsOffcanvas.hide();
+        openSubmitModal();
+      });
+
+      btnFinalSubmit.addEventListener('click', () => {
+        submitConfirmModal.hide();
+        autoSubmitExam('Selesai Mandiri');
+      });
+
+      function autoSubmitExam(completionStatus = 'Selesai Mandiri') {
+        if (isExamFinished) return;
+        isExamFinished = true;
+        clearInterval(timerInterval);
+
+        // Calculate score
+        let correctCount = 0;
+        let wrongCount = 0;
+        const total = questions.length;
+
+        questions.forEach((q, idx) => {
+          const studentAns = answers[idx];
+          if (studentAns && studentAns.toUpperCase() === q.key.toUpperCase()) {
+            correctCount++;
+          } else {
+            wrongCount++;
+          }
+        });
+
+        const score = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+        const kkm = settings.kkm || 75;
+        const isPassed = score >= kkm;
+
+        const record = {
+          id: 'REC_' + Date.now(),
+          studentName: session.studentName,
+          grade: session.grade,
+          subject: session.subject,
+          examType: session.examType,
+          totalQuestions: total,
+          correctAnswers: correctCount,
+          wrongAnswers: wrongCount,
+          score: score,
+          isPassed: isPassed,
+          violations: violations,
+          status: completionStatus,
+          completedAt: new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'medium' })
+        };
+
+        // Save to rekapitulasi nilai for Teacher/Admin evaluation
+        ExamApp.Storage.addRekapNilai(record);
+        // Clear active session
+        ExamApp.Storage.clearSession();
+
+        // Sound effect
+        ExamApp.AudioEngine.success();
+
+        // Show Submission Confirmation Screen (Zero score shown to student)
+        displayResultScreen(record);
+      }
+
+      function displayResultScreen(rec) {
+        document.getElementById('cardStudentName').textContent = rec.studentName;
+        document.getElementById('cardStudentGrade').textContent = 'Kelas ' + rec.grade + ' SMP';
+        document.getElementById('cardSubject').textContent = rec.subject;
+        document.getElementById('cardExamType').textContent = rec.examType === 'Midterm' ? 'Penilaian Tengah Semester (Midterm)' : 'Penilaian Akhir Semester (Final Test)';
+        document.getElementById('cardSubmitTime').textContent = rec.completedAt;
+        const schoolNameEl = document.getElementById('cardSchoolName');
+        if (schoolNameEl) {
+          schoolNameEl.textContent = settings.schoolName || 'SMP IT Bunayya Lhokseumawe';
+        }
+
+        resultModal.show();
+
+        // Automatic redirect countdown to index.html (8 seconds)
+        let redirectSec = 8;
+        const countdownEl = document.getElementById('redirectCountdown');
+        const redirectInterval = setInterval(() => {
+          redirectSec--;
+          if (countdownEl) {
+            countdownEl.textContent = redirectSec;
+          }
+          if (redirectSec <= 0) {
+            clearInterval(redirectInterval);
+            window.location.href = 'index.html';
+          }
+        }, 1000);
+      }
+
+      // Initial Question Render
+      renderQuestion(currentIndex);
+    });
+  </script>
+</body>
+</html>
