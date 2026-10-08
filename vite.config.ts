@@ -1,8 +1,31 @@
-import path from 'path';
-import {defineConfig} from 'vite';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import fs from 'node:fs';
+import { defineConfig } from 'vite';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+function copyStaticAssets() {
+  return {
+    name: 'copy-static-assets',
+    closeBundle() {
+      const distDir = path.resolve(__dirname, 'dist');
+      const folders = ['js', 'css'];
+      for (const folder of folders) {
+        const src = path.resolve(__dirname, folder);
+        const dest = path.resolve(distDir, folder);
+        if (fs.existsSync(src)) {
+          fs.cpSync(src, dest, { recursive: true });
+        }
+      }
+    },
+  };
+}
 
 export default defineConfig(() => {
   return {
+    plugins: [copyStaticAssets()],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
@@ -26,3 +49,4 @@ export default defineConfig(() => {
     },
   };
 });
+
