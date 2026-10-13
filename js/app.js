@@ -193,10 +193,37 @@
     },
     getSubjectToken(subject) {
       const settings = this.getSettings();
-      if (settings.subjectTokens && settings.subjectTokens[subject]) {
-        return settings.subjectTokens[subject];
+      if (!subject) return String(settings.token || DEFAULT_SETTINGS.token).trim();
+
+      const normalizedSubject = String(subject).toLowerCase().trim();
+
+      // Check subjectTokens mapping if exists
+      if (settings.subjectTokens && typeof settings.subjectTokens === 'object') {
+        // Direct match
+        if (settings.subjectTokens[subject]) {
+          return String(settings.subjectTokens[subject]).trim();
+        }
+        // Case-insensitive & partial key match
+        for (const [key, val] of Object.entries(settings.subjectTokens)) {
+          const normKey = String(key).toLowerCase().trim();
+          if (normKey === normalizedSubject || normalizedSubject.includes(normKey) || normKey.includes(normalizedSubject)) {
+            return String(val).trim();
+          }
+        }
       }
-      return settings.token || DEFAULT_SETTINGS.token;
+
+      // Subject specific fallback
+      if (normalizedSubject.includes('informatika')) {
+        return 'INF1899';
+      }
+      if (normalizedSubject.includes('koding') || normalizedSubject.includes('artifisial') || normalizedSubject.includes('ai')) {
+        return 'KOD1899';
+      }
+      if (normalizedSubject.includes('web') || normalizedSubject.includes('programming')) {
+        return 'WEB1899';
+      }
+
+      return String(settings.token || DEFAULT_SETTINGS.token).trim();
     },
 
     /**

@@ -338,11 +338,14 @@
           return;
         }
 
-        // Validate Token per Mata Pelajaran
-        const expectedToken = ExamApp.Storage.getSubjectToken(subject);
-        if (token.toUpperCase() !== expectedToken.toUpperCase()) {
+        // Validate Token per Mata Pelajaran (String-safe, whitespace-trimmed, case-insensitive)
+        const currentSettings = ExamApp.Storage.getSettings();
+        const enteredToken = String(token || '').trim().toUpperCase();
+        const expectedToken = String(ExamApp.Storage.getSubjectToken(subject) || '').trim().toUpperCase();
+
+        if (!enteredToken || enteredToken !== expectedToken) {
           ExamApp.AudioEngine.warning();
-          ExamApp.Toast.show(`Token ujian untuk mata pelajaran ${subject} tidak valid atau salah! Silakan tanyakan token resmi ke Pengawas / Guru.`, 'danger', 'Akses Ditolak');
+          ExamApp.Toast.show(`Token ujian untuk mata pelajaran "${subject}" tidak valid atau salah! Silakan tanyakan token resmi ke Pengawas / Guru.`, 'danger', 'Akses Ditolak');
           return;
         }
 
@@ -372,7 +375,7 @@
           answers: {},
           doubtful: {},
           startTime: Date.now(),
-          durationMinutes: currentSettings.durationMinutes || 60,
+          durationMinutes: parseInt(currentSettings.durationMinutes, 10) || 60,
           violations: 0,
           currentQuestionIndex: 0
         };
