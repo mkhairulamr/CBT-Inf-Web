@@ -167,14 +167,8 @@
       }
       try {
         const parsed = JSON.parse(saved);
-        // Ensure adminPin defaults to secret password if not set or if old default was present
-        if (!parsed.adminPin || parsed.adminPin === 'admin123') {
-          parsed.adminPin = DEFAULT_SETTINGS.adminPin;
-          this.saveSettings(parsed);
-        }
-        if (!parsed.schoolName || parsed.schoolName.includes('INDONESIA MAJU')) {
-          parsed.schoolName = DEFAULT_SETTINGS.schoolName;
-          this.saveSettings(parsed);
+        if (typeof parsed !== 'object' || parsed === null) {
+          return { ...DEFAULT_SETTINGS };
         }
         return { ...DEFAULT_SETTINGS, ...parsed };
       } catch (e) {

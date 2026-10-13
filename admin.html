@@ -393,13 +393,13 @@
               <!-- Filter Search for Rekap -->
               <div class="p-3 border-bottom bg-white">
                 <div class="row g-2 align-items-center">
-                  <div class="col-md-4">
+                  <div class="col-md-3">
                     <div class="input-group input-group-sm">
                       <span class="input-group-text"><i class="fas fa-search"></i></span>
                       <input type="text" id="searchStudentInput" class="form-control" placeholder="Cari Nama Siswa...">
                     </div>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-2">
                     <select id="filterRekapClass" class="form-select form-select-sm">
                       <option value="ALL">Semua Kelas</option>
                       <option value="7">Kelas 7</option>
@@ -408,6 +408,13 @@
                     </select>
                   </div>
                   <div class="col-md-3">
+                    <select id="filterRekapExamType" class="form-select form-select-sm">
+                      <option value="ALL">Semua Jenis Ujian</option>
+                      <option value="Midterm">Midterm (PTS)</option>
+                      <option value="Final">Final Test (PAS)</option>
+                    </select>
+                  </div>
+                  <div class="col-md-2">
                     <select id="filterRekapSubject" class="form-select form-select-sm">
                       <option value="ALL">Semua Mapel</option>
                       <option value="Informatika">Informatika</option>
@@ -429,12 +436,14 @@
                       <tr>
                         <th style="width: 40px;" class="text-center">No</th>
                         <th>Nama Siswa</th>
-                        <th>Kelas / Mapel</th>
-                        <th class="text-center">Nilai</th>
-                        <th class="text-center">Benar/Salah</th>
-                        <th class="text-center">Pelanggaran</th>
-                        <th>Waktu Selesai</th>
-                        <th style="width: 70px;" class="text-center">Aksi</th>
+                        <th style="width: 110px;">Kelas</th>
+                        <th style="width: 140px;">Jenis Ujian</th>
+                        <th>Mata Pelajaran</th>
+                        <th class="text-center" style="width: 90px;">Nilai</th>
+                        <th class="text-center" style="width: 120px;">Benar/Salah</th>
+                        <th class="text-center" style="width: 120px;">Pelanggaran</th>
+                        <th style="width: 170px;">Waktu Selesai</th>
+                        <th style="width: 60px;" class="text-center">Aksi</th>
                       </tr>
                     </thead>
                     <tbody id="rekapTableBody">
@@ -509,7 +518,10 @@
                       <label class="form-label fw-bold">PIN Masuk Admin</label>
                       <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                        <input type="password" id="settingAdminPin" class="form-control form-control-lg" placeholder="••••••••" required>
+                        <input type="password" id="settingAdminPin" class="form-control form-control-lg" placeholder="Masukkan PIN Admin" required autocomplete="off">
+                        <button class="btn btn-outline-secondary" type="button" id="toggleSettingPinVisibility">
+                          <i class="fas fa-eye"></i>
+                        </button>
                       </div>
                       <div class="form-text small">PIN akses rahasia untuk masuk ke dashboard guru/admin.</div>
                     </div>
@@ -1686,6 +1698,7 @@ Pembahasan: Tag <h1> adalah heading tingkat tertinggi dengan ukuran teks terbesa
       const rekapTableBody = document.getElementById('rekapTableBody');
       const searchStudentInput = document.getElementById('searchStudentInput');
       const filterRekapClass = document.getElementById('filterRekapClass');
+      const filterRekapExamType = document.getElementById('filterRekapExamType');
       const filterRekapSubject = document.getElementById('filterRekapSubject');
       const rekapCountBadge = document.getElementById('rekapCountBadge');
       const btnExportRekapExcel = document.getElementById('btnExportRekapExcel');
@@ -1693,22 +1706,31 @@ Pembahasan: Tag <h1> adalah heading tingkat tertinggi dengan ukuran teks terbesa
       const btnPrintRekapTable = document.getElementById('btnPrintRekapTable');
       const btnClearAllRekap = document.getElementById('btnClearAllRekap');
 
+      function getFilteredRekapData() {
+        const list = ExamApp.Storage.getRekapNilai();
+        const search = searchStudentInput ? searchStudentInput.value.toLowerCase().trim() : '';
+        const cls = filterRekapClass ? filterRekapClass.value : 'ALL';
+        const examType = filterRekapExamType ? filterRekapExamType.value : 'ALL';
+        const subj = filterRekapSubject ? filterRekapSubject.value : 'ALL';
+
+        return list.filter(r => {
+          const matchSearch = (!search || (r.studentName && r.studentName.toLowerCase().includes(search)));
+          const matchCls = (cls === 'ALL' || String(r.grade) === String(cls));
+          const matchExamType = (examType === 'ALL' || (r.examType && r.examType.toLowerCase() === examType.toLowerCase()));
+          const matchSubj = (subj === 'ALL' || (r.subject && r.subject.toLowerCase() === subj.toLowerCase()));
+          return matchSearch && matchCls && matchExamType && matchSubj;
+        });
+      }
+
       function renderRekapTable() {
         rekapNilai = ExamApp.Storage.getRekapNilai();
-        const search = searchStudentInput.value.toLowerCase().trim();
-        const cls = filterRekapClass.value;
-        const subj = filterRekapSubject.value;
+        const filtered = getFilteredRekapData();
 
-        const filtered = rekapNilai.filter(r => {
-          const matchSearch = (!search || r.studentName.toLowerCase().includes(search));
-          const matchCls = (cls === 'ALL' || String(r.grade) === cls);
-          const matchSubj = (subj === 'ALL' || r.subject.toLowerCase() === subj.toLowerCase());
-          return matchSearch && matchCls && matchSubj;
-        });
+        if (rekapCountBadge) {
+          rekapCountBadge.textContent = `${filtered.length} Rekap`;
+        }
 
-        rekapCountBadge.textContent = `${filtered.length} Rekap`;
-
-        // Update Stats
+        // Update Global Stats (from all submitted students)
         const total = rekapNilai.length;
         document.getElementById('statTotalStudents').textContent = total;
 
@@ -1736,10 +1758,10 @@ Pembahasan: Tag <h1> adalah heading tingkat tertinggi dengan ukuran teks terbesa
         if (filtered.length === 0) {
           rekapTableBody.innerHTML = `
             <tr>
-              <td colspan="8" class="text-center py-5 text-muted">
+              <td colspan="10" class="text-center py-5 text-muted">
                 <i class="fas fa-clipboard-check fa-3x mb-3 text-secondary-subtle"></i>
-                <div class="fw-semibold">Belum ada rekapitulasi ujian siswa yang tersimpan.</div>
-                <div class="small">Data nilai akan otomatis masuk setelah siswa menyelesaikan ujian di lembar CBT.</div>
+                <div class="fw-semibold">Belum ada rekapitulasi ujian siswa yang sesuai dengan filter.</div>
+                <div class="small">Data nilai otomatis masuk saat siswa menyelesaikan ujian di lembar CBT. Pastikan filter Kelas, Jenis Ujian, dan Mapel telah disesuaikan.</div>
               </td>
             </tr>
           `;
@@ -1753,6 +1775,10 @@ Pembahasan: Tag <h1> adalah heading tingkat tertinggi dengan ukuran teks terbesa
             ? `<span class="badge bg-danger-subtle text-danger border border-danger-subtle">${r.violations}x Peringatan</span>`
             : `<span class="badge bg-success-subtle text-success border border-success-subtle">Tertib (0)</span>`;
 
+          const examTypeBadge = r.examType === 'Midterm'
+            ? `<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle"><i class="fas fa-calendar-alt me-1"></i>Midterm</span>`
+            : `<span class="badge bg-info-subtle text-info-emphasis border border-info-subtle"><i class="fas fa-calendar-check me-1"></i>Final Test</span>`;
+
           html += `
             <tr>
               <td class="text-center text-muted fw-bold">${idx + 1}</td>
@@ -1760,9 +1786,13 @@ Pembahasan: Tag <h1> adalah heading tingkat tertinggi dengan ukuran teks terbesa
                 <div class="fw-bold text-dark">${escapeHtml(r.studentName)}</div>
               </td>
               <td>
-                <span class="badge bg-secondary-subtle text-dark border">Kelas ${r.grade}</span>
-                <div class="small fw-semibold mt-1">${escapeHtml(r.subject)}</div>
-                <small class="text-muted">(${escapeHtml(r.examType)})</small>
+                <span class="badge bg-secondary-subtle text-dark border"><i class="fas fa-graduation-cap me-1"></i>Kelas ${r.grade}</span>
+              </td>
+              <td>
+                ${examTypeBadge}
+              </td>
+              <td>
+                <div class="small fw-semibold text-dark">${escapeHtml(r.subject)}</div>
               </td>
               <td class="text-center">
                 <span class="fs-5 ${passClass}">${r.score}</span>
@@ -1835,9 +1865,10 @@ Pembahasan: Tag <h1> adalah heading tingkat tertinggi dengan ukuran teks terbesa
         });
       }
 
-      searchStudentInput.addEventListener('input', renderRekapTable);
-      filterRekapClass.addEventListener('change', renderRekapTable);
-      filterRekapSubject.addEventListener('change', renderRekapTable);
+      if (searchStudentInput) searchStudentInput.addEventListener('input', renderRekapTable);
+      if (filterRekapClass) filterRekapClass.addEventListener('change', renderRekapTable);
+      if (filterRekapExamType) filterRekapExamType.addEventListener('change', renderRekapTable);
+      if (filterRekapSubject) filterRekapSubject.addEventListener('change', renderRekapTable);
 
       // Clear all rekap via modal (reliable in iframe)
       if (btnClearAllRekap) {
@@ -1873,14 +1904,14 @@ Pembahasan: Tag <h1> adalah heading tingkat tertinggi dengan ukuran teks terbesa
 
       // Export Rekap to Excel (.xlsx) using SheetJS
       btnExportRekapExcel.addEventListener('click', () => {
-        const rekap = ExamApp.Storage.getRekapNilai();
+        const rekap = getFilteredRekapData();
         if (rekap.length === 0) {
-          ExamApp.Toast.show('Belum ada data nilai untuk diekspor!', 'warning');
+          ExamApp.Toast.show('Belum ada data nilai yang sesuai untuk diekspor!', 'warning');
           return;
         }
 
         const dataRows = [
-          ["No", "Nama Lengkap Siswa", "Kelas", "Mata Pelajaran", "Jenis Ujian", "Total Soal", "Benar", "Salah", "Nilai Akhir", "Status Kelulusan", "Jumlah Pelanggaran", "Keterangan", "Waktu Selesai"]
+          ["No", "Nama Lengkap Siswa", "Kelas", "Jenis Ujian", "Mata Pelajaran", "Total Soal", "Benar", "Salah", "Nilai Akhir", "Status Kelulusan", "Jumlah Pelanggaran", "Keterangan", "Waktu Selesai"]
         ];
 
         rekap.forEach((r, idx) => {
@@ -1888,8 +1919,8 @@ Pembahasan: Tag <h1> adalah heading tingkat tertinggi dengan ukuran teks terbesa
             idx + 1,
             r.studentName,
             "Kelas " + r.grade,
-            r.subject,
             r.examType,
+            r.subject,
             r.totalQuestions,
             r.correctAnswers,
             r.wrongAnswers,
@@ -1903,30 +1934,30 @@ Pembahasan: Tag <h1> adalah heading tingkat tertinggi dengan ukuran teks terbesa
 
         const ws = XLSX.utils.aoa_to_sheet(dataRows);
         ws['!cols'] = [
-          { wch: 5 }, { wch: 25 }, { wch: 10 }, { wch: 25 }, { wch: 15 },
+          { wch: 5 }, { wch: 25 }, { wch: 10 }, { wch: 15 }, { wch: 25 },
           { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 12 }, { wch: 15 }, { wch: 18 }, { wch: 20 }, { wch: 25 }
         ];
 
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Rekap_Nilai_CBT");
         XLSX.writeFile(wb, `Rekapitulasi_Nilai_SMP_${new Date().toISOString().slice(0, 10)}.xlsx`);
-        ExamApp.Toast.show('Berkas Excel berhasil diunduh!', 'success');
+        ExamApp.Toast.show(`Berkas Excel (${rekap.length} data siswa) berhasil diunduh!`, 'success');
       });
 
       // Export Rekap to CSV using PapaParse
       btnExportRekapCSV.addEventListener('click', () => {
-        const rekap = ExamApp.Storage.getRekapNilai();
+        const rekap = getFilteredRekapData();
         if (rekap.length === 0) {
-          ExamApp.Toast.show('Belum ada data nilai untuk diekspor!', 'warning');
+          ExamApp.Toast.show('Belum ada data nilai yang sesuai untuk diekspor!', 'warning');
           return;
         }
 
         const formatted = rekap.map((r, idx) => ({
           "No": idx + 1,
           "Nama Siswa": r.studentName,
-          "Kelas": r.grade,
-          "Mata Pelajaran": r.subject,
+          "Kelas": "Kelas " + r.grade,
           "Jenis Ujian": r.examType,
+          "Mata Pelajaran": r.subject,
           "Total Soal": r.totalQuestions,
           "Benar": r.correctAnswers,
           "Salah": r.wrongAnswers,
@@ -1944,7 +1975,7 @@ Pembahasan: Tag <h1> adalah heading tingkat tertinggi dengan ukuran teks terbesa
         a.download = `Rekap_Nilai_SMP_${new Date().toISOString().slice(0, 10)}.csv`;
         a.click();
         URL.revokeObjectURL(url);
-        ExamApp.Toast.show('Berkas CSV berhasil diunduh!', 'success');
+        ExamApp.Toast.show(`Berkas CSV (${rekap.length} data siswa) berhasil diunduh!`, 'success');
       });
 
       // Print Rekap Table
@@ -1963,6 +1994,15 @@ Pembahasan: Tag <h1> adalah heading tingkat tertinggi dengan ukuran teks terbesa
       const settingMaxViolations = document.getElementById('settingMaxViolations');
       const settingAdminPin = document.getElementById('settingAdminPin');
       const btnRestoreDefaults = document.getElementById('btnRestoreDefaults');
+
+      const toggleSettingPinBtn = document.getElementById('toggleSettingPinVisibility');
+      if (toggleSettingPinBtn && settingAdminPin) {
+        toggleSettingPinBtn.addEventListener('click', () => {
+          const type = settingAdminPin.type === 'password' ? 'text' : 'password';
+          settingAdminPin.type = type;
+          toggleSettingPinBtn.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+        });
+      }
 
       function populateSettingsForm() {
         currentSettings = ExamApp.Storage.getSettings();
