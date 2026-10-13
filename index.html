@@ -338,11 +338,11 @@
           return;
         }
 
-        // Validate Token
-        const currentSettings = ExamApp.Storage.getSettings();
-        if (token.toUpperCase() !== currentSettings.token.toUpperCase()) {
+        // Validate Token per Mata Pelajaran
+        const expectedToken = ExamApp.Storage.getSubjectToken(subject);
+        if (token.toUpperCase() !== expectedToken.toUpperCase()) {
           ExamApp.AudioEngine.warning();
-          ExamApp.Toast.show('Token ujian tidak valid atau salah! Silakan tanyakan token resmi ke Pengawas / Guru.', 'danger', 'Akses Ditolak');
+          ExamApp.Toast.show(`Token ujian untuk mata pelajaran ${subject} tidak valid atau salah! Silakan tanyakan token resmi ke Pengawas / Guru.`, 'danger', 'Akses Ditolak');
           return;
         }
 

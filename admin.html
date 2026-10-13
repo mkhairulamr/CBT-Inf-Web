@@ -478,13 +478,55 @@
                       <div class="form-text small">Nama institusi sekolah yang tertera pada lembar ujian dan kop surat laporan CBT.</div>
                     </div>
 
-                    <div class="col-md-6">
-                      <label class="form-label fw-bold">Token Masuk Ujian Siswa</label>
-                      <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-key"></i></span>
-                        <input type="text" id="settingToken" class="form-control form-control-lg fw-bold" placeholder="Ketik token ujian" required maxlength="10">
+                    <div class="col-12">
+                      <div class="card border border-primary-subtle bg-primary-subtle rounded-3 p-3">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                          <h6 class="fw-bold text-dark mb-0">
+                            <i class="fas fa-key text-warning me-2"></i> Token Masuk Ujian Berdasarkan Mata Pelajaran
+                          </h6>
+                          <span class="badge bg-secondary-subtle text-secondary border fw-normal">
+                            <i class="fas fa-lock me-1"></i> Bersifat Rahasia
+                          </span>
+                        </div>
+                        <p class="text-muted small mb-3">
+                          Tentukan token berbeda untuk tiap mata pelajaran. Siswa hanya dapat memulai ujian jika token yang dimasukkan sesuai dengan mata pelajaran yang dipilih.
+                        </p>
+
+                        <div class="row g-3">
+                          <div class="col-md-4">
+                            <label class="form-label small fw-bold text-dark">
+                              <i class="fas fa-laptop-code text-primary me-1"></i> 1. Informatika
+                            </label>
+                            <div class="input-group">
+                              <span class="input-group-text"><i class="fas fa-key"></i></span>
+                              <input type="text" id="settingTokenInf" class="form-control fw-bold font-monospace text-uppercase" placeholder="INF1899" required maxlength="12">
+                            </div>
+                            <div class="form-text small text-muted">Token untuk mapel Informatika.</div>
+                          </div>
+
+                          <div class="col-md-4">
+                            <label class="form-label small fw-bold text-dark">
+                              <i class="fas fa-robot text-success me-1"></i> 2. Koding & Kecerdasan Artifisial
+                            </label>
+                            <div class="input-group">
+                              <span class="input-group-text"><i class="fas fa-key"></i></span>
+                              <input type="text" id="settingTokenKod" class="form-control fw-bold font-monospace text-uppercase" placeholder="KOD1899" required maxlength="12">
+                            </div>
+                            <div class="form-text small text-muted">Token untuk Koding & AI.</div>
+                          </div>
+
+                          <div class="col-md-4">
+                            <label class="form-label small fw-bold text-dark">
+                              <i class="fas fa-globe text-info me-1"></i> 3. Web Programming
+                            </label>
+                            <div class="input-group">
+                              <span class="input-group-text"><i class="fas fa-key"></i></span>
+                              <input type="text" id="settingTokenWeb" class="form-control fw-bold font-monospace text-uppercase" placeholder="WEB1899" required maxlength="12">
+                            </div>
+                            <div class="form-text small text-muted">Token untuk Web Programming.</div>
+                          </div>
+                        </div>
                       </div>
-                      <div class="form-text small text-muted"><i class="fas fa-lock me-1"></i> Token bersifat rahasia. Bagikan kepada siswa hanya saat sesi ujian dimulai.</div>
                     </div>
 
                     <div class="col-md-6">
@@ -2004,10 +2046,19 @@ Pembahasan: Tag <h1> adalah heading tingkat tertinggi dengan ukuran teks terbesa
         });
       }
 
+      const settingTokenInf = document.getElementById('settingTokenInf');
+      const settingTokenKod = document.getElementById('settingTokenKod');
+      const settingTokenWeb = document.getElementById('settingTokenWeb');
+
       function populateSettingsForm() {
         currentSettings = ExamApp.Storage.getSettings();
         if (settingSchoolName) settingSchoolName.value = currentSettings.schoolName || 'SMP IT Bunayya Lhokseumawe';
-        settingToken.value = currentSettings.token || '1899';
+        
+        const subjTokens = currentSettings.subjectTokens || ExamApp.DEFAULT_SETTINGS.subjectTokens;
+        if (settingTokenInf) settingTokenInf.value = subjTokens['Informatika'] || 'INF1899';
+        if (settingTokenKod) settingTokenKod.value = subjTokens['Koding & Kecerdasan Artifisial'] || 'KOD1899';
+        if (settingTokenWeb) settingTokenWeb.value = subjTokens['Web Programming'] || 'WEB1899';
+
         settingDuration.value = currentSettings.durationMinutes || 60;
         settingKKM.value = currentSettings.kkm || 75;
         settingMaxViolations.value = currentSettings.maxViolations || 3;
@@ -2021,10 +2072,20 @@ Pembahasan: Tag <h1> adalah heading tingkat tertinggi dengan ukuran teks terbesa
 
       settingsForm.addEventListener('submit', (e) => {
         e.preventDefault();
+
+        const infToken = (settingTokenInf ? settingTokenInf.value.trim().toUpperCase() : '') || 'INF1899';
+        const kodToken = (settingTokenKod ? settingTokenKod.value.trim().toUpperCase() : '') || 'KOD1899';
+        const webToken = (settingTokenWeb ? settingTokenWeb.value.trim().toUpperCase() : '') || 'WEB1899';
+
         const updated = {
           ...currentSettings,
           schoolName: (settingSchoolName ? settingSchoolName.value.trim() : '') || 'SMP IT Bunayya Lhokseumawe',
-          token: settingToken.value.trim().toUpperCase(),
+          token: infToken, // Fallback token
+          subjectTokens: {
+            'Informatika': infToken,
+            'Koding & Kecerdasan Artifisial': kodToken,
+            'Web Programming': webToken
+          },
           durationMinutes: parseInt(settingDuration.value, 10) || 60,
           kkm: parseInt(settingKKM.value, 10) || 75,
           maxViolations: parseInt(settingMaxViolations.value, 10) || 3,
@@ -2038,7 +2099,7 @@ Pembahasan: Tag <h1> adalah heading tingkat tertinggi dengan ukuran teks terbesa
           navbarSchool.textContent = updated.schoolName;
         }
         ExamApp.AudioEngine.success();
-        ExamApp.Toast.show('Pengaturan sistem berhasil disimpan!', 'success');
+        ExamApp.Toast.show('Pengaturan token per mata pelajaran & PIN berhasil disimpan!', 'success');
       });
 
       btnRestoreDefaults.addEventListener('click', () => {

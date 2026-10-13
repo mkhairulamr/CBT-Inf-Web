@@ -20,7 +20,12 @@
   // Default App Settings
   // Password admin rahasia: "Mautauaja1899!"
   const DEFAULT_SETTINGS = {
-    token: '1899',
+    token: '1899', // Token universal fallback
+    subjectTokens: {
+      'Informatika': 'INF1899',
+      'Koding & Kecerdasan Artifisial': 'KOD1899',
+      'Web Programming': 'WEB1899'
+    },
     adminPin: 'Mautauaja1899!',
     durationMinutes: 60,
     kkm: 75,
@@ -163,20 +168,35 @@
       const saved = localStorage.getItem(STORAGE_KEYS.SETTINGS);
       if (!saved) {
         localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(DEFAULT_SETTINGS));
-        return { ...DEFAULT_SETTINGS };
+        return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
       }
       try {
         const parsed = JSON.parse(saved);
         if (typeof parsed !== 'object' || parsed === null) {
-          return { ...DEFAULT_SETTINGS };
+          return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
         }
-        return { ...DEFAULT_SETTINGS, ...parsed };
+        const merged = {
+          ...DEFAULT_SETTINGS,
+          ...parsed,
+          subjectTokens: {
+            ...DEFAULT_SETTINGS.subjectTokens,
+            ...(parsed.subjectTokens || {})
+          }
+        };
+        return merged;
       } catch (e) {
-        return { ...DEFAULT_SETTINGS };
+        return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
       }
     },
     saveSettings(settings) {
       localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+    },
+    getSubjectToken(subject) {
+      const settings = this.getSettings();
+      if (settings.subjectTokens && settings.subjectTokens[subject]) {
+        return settings.subjectTokens[subject];
+      }
+      return settings.token || DEFAULT_SETTINGS.token;
     },
 
     /**
