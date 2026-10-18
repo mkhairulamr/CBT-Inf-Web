@@ -31,9 +31,13 @@
       </a>
 
       <div class="d-flex align-items-center gap-2 ms-auto">
-        <a href="index.html" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1 rounded-pill px-3">
-          <i class="fas fa-external-link-alt"></i>
-          <span>Portal Siswa</span>
+        <a href="portal-siswa.html" class="btn btn-warning btn-sm d-flex align-items-center gap-1 rounded-pill px-3 fw-bold text-dark" title="Buka Portal Hasil Nilai Siswa">
+          <i class="fas fa-user-graduate"></i>
+          <span>Portal Nilai Siswa</span>
+        </a>
+        <a href="index.html" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1 rounded-pill px-3" title="Buka Lembar Ujian Siswa">
+          <i class="fas fa-pen-to-square"></i>
+          <span>Ujian Siswa</span>
         </a>
         <button id="btnLogoutAdmin" class="btn btn-danger btn-sm d-flex align-items-center gap-1 rounded-pill px-3">
           <i class="fas fa-sign-out-alt"></i>
@@ -64,6 +68,9 @@
             </button>
             <button class="nav-link" id="tab-import-btn" data-bs-toggle="pill" data-bs-target="#tab-import" type="button" role="tab">
               <i class="fas fa-file-import"></i> Impor Multi-Format
+            </button>
+            <button class="nav-link" id="tab-export-btn" data-bs-toggle="pill" data-bs-target="#tab-export" type="button" role="tab">
+              <i class="fas fa-file-export"></i> Ekspor Soal Ujian
             </button>
             <button class="nav-link" id="tab-rekap-btn" data-bs-toggle="pill" data-bs-target="#tab-rekap" type="button" role="tab">
               <i class="fas fa-chart-bar"></i> Rekap Nilai Siswa
@@ -110,8 +117,8 @@
                   <button id="btnReloadOfficialBank" class="btn btn-outline-success btn-sm" title="Muat / Pulihkan Bank Soal Resmi (360 Soal: Informatika & Web Programming Kelas 7, 8, 9)">
                     <i class="fas fa-arrows-rotate"></i> Muat Soal Resmi (360 Soal)
                   </button>
-                  <button id="btnExportBankJson" class="btn btn-outline-secondary btn-sm" title="Ekspor Cadangan Soal (JSON)">
-                    <i class="fas fa-download"></i> Backup JSON
+                  <button id="btnGoToExportTab" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1" title="Buka Menu Khusus Ekspor Soal Ujian">
+                    <i class="fas fa-file-export"></i> Menu Ekspor Soal
                   </button>
                   <button id="btnDeleteFilteredCategory" class="btn btn-outline-warning text-dark btn-sm" title="Hapus seluruh butir soal pada kategori yang sedang difilter">
                     <i class="fas fa-filter-circle-xmark"></i> Hapus Kategori Terfilter
@@ -330,7 +337,172 @@
             </div>
           </div>
 
-          <!-- TAB 3: REKAPITULASI NILAI -->
+          <!-- TAB 3: MENU KHUSUS EKSPOR SOAL UJIAN -->
+          <div class="tab-pane fade" id="tab-export" role="tabpanel">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+              <div class="card-header bg-white border-bottom py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div>
+                  <h5 class="fw-bold mb-1 text-dark d-flex align-items-center gap-2">
+                    <i class="fas fa-file-export text-primary"></i> Menu Khusus Ekspor Soal Ujian
+                  </h5>
+                  <p class="text-muted small mb-0">
+                    Pilih tingkat kelas, jenis ujian, dan mata pelajaran untuk mengekspor soal ke berkas <strong>Excel (.xlsx)</strong>, <strong>Naskah Word (.doc)</strong>, <strong>CSV</strong>, atau <strong>JSON</strong>.
+                  </p>
+                </div>
+                <div>
+                  <button id="btnResetExportFilters" class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1">
+                    <i class="fas fa-rotate-left"></i> Reset Kriteria
+                  </button>
+                </div>
+              </div>
+
+              <div class="card-body p-4">
+                
+                <!-- Filter Form Panel: Pilihan Kelas, Jenis Ujian, dan Mapel -->
+                <div class="p-3 bg-light rounded-3 border mb-4">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold text-dark mb-0 small text-uppercase tracking-wider">
+                      <i class="fas fa-sliders-h text-primary me-1"></i> Tentukan Kriteria Soal yang Hendak Diekspor:
+                    </h6>
+                    <span class="small text-muted">Pratinjau butir soal otomatis diperbarui secara langsung</span>
+                  </div>
+
+                  <div class="row g-3">
+                    <div class="col-md-4">
+                      <label class="form-label small fw-bold text-dark">
+                        <i class="fas fa-graduation-cap text-primary me-1"></i> 1. Tingkat Kelas:
+                      </label>
+                      <select id="exportSelectGrade" class="form-select">
+                        <option value="ALL">Semua Tingkat Kelas (7, 8, 9)</option>
+                        <option value="7">Kelas 7 SMP</option>
+                        <option value="8">Kelas 8 SMP</option>
+                        <option value="9">Kelas 9 SMP</option>
+                      </select>
+                    </div>
+
+                    <div class="col-md-4">
+                      <label class="form-label small fw-bold text-dark">
+                        <i class="fas fa-file-signature text-info me-1"></i> 2. Jenis Ujian:
+                      </label>
+                      <select id="exportSelectExamType" class="form-select">
+                        <option value="ALL">Semua Jenis Ujian (Midterm & Final)</option>
+                        <option value="Midterm">Penilaian Tengah Semester (Midterm / PTS)</option>
+                        <option value="Final">Penilaian Akhir Semester (Final Test / PAS)</option>
+                      </select>
+                    </div>
+
+                    <div class="col-md-4">
+                      <label class="form-label small fw-bold text-dark">
+                        <i class="fas fa-book text-success me-1"></i> 3. Mata Pelajaran:
+                      </label>
+                      <select id="exportSelectSubject" class="form-select">
+                        <option value="ALL">Semua Mata Pelajaran</option>
+                        <option value="Informatika">1. Informatika</option>
+                        <option value="Koding & Kecerdasan Artifisial">2. Koding & Kecerdasan Artifisial</option>
+                        <option value="Web Programming">3. Web Programming</option>
+                      </select>
+                    </div>
+
+                    <div class="col-md-8">
+                      <div class="form-check form-switch mt-2">
+                        <input class="form-check-input" type="checkbox" id="exportSelectIncludeKeys" checked>
+                        <label class="form-check-label small fw-bold" for="exportSelectIncludeKeys">
+                          Sertakan Kunci Jawaban & Pembahasan Lengkap (Arsip Guru / Kisi-Kisi)
+                        </label>
+                        <div class="form-text text-muted">
+                          Nonaktifkan opsi ini jika ingin naskah soal bersih tanpa kunci jawaban (untuk lembar ujian cetak siswa).
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-md-4 text-md-end mt-auto">
+                      <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" id="exportSearchInput" class="form-control" placeholder="Cari kata kunci soal...">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Status Banner & Export Action Buttons -->
+                <div class="card border-primary-subtle bg-primary-subtle p-3 rounded-4 mb-4">
+                  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+                    <div>
+                      <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="badge bg-primary fs-6 px-3 py-2" id="exportBadgeCount">0 Butir Soal</span>
+                        <span class="fw-bold text-dark fs-6">Siap Diekspor</span>
+                      </div>
+                      <small class="text-muted" id="exportActiveFilterLabel">Kriteria: Semua Kelas • Semua Jenis Ujian • Semua Mata Pelajaran</small>
+                    </div>
+                  </div>
+
+                  <!-- 4 Action Cards -->
+                  <div class="row g-3">
+                    <div class="col-sm-6 col-lg-3">
+                      <button id="btnExportTabExcel" class="btn btn-success w-100 py-3 shadow-sm rounded-3 d-flex flex-column align-items-center justify-content-center gap-1 fw-bold">
+                        <i class="far fa-file-excel fa-2x mb-1"></i>
+                        <span>Ekspor ke Excel (.xlsx)</span>
+                        <small class="fw-normal opacity-75" style="font-size: 0.75rem;">Format tabel kisi-kisi resmi</small>
+                      </button>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-3">
+                      <button id="btnExportTabWord" class="btn btn-primary w-100 py-3 shadow-sm rounded-3 d-flex flex-column align-items-center justify-content-center gap-1 fw-bold">
+                        <i class="far fa-file-word fa-2x mb-1"></i>
+                        <span>Naskah Word (.doc)</span>
+                        <small class="fw-normal opacity-75" style="font-size: 0.75rem;">Format ujian cetak lengkap kop</small>
+                      </button>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-3">
+                      <button id="btnExportTabCSV" class="btn btn-info text-dark w-100 py-3 shadow-sm rounded-3 d-flex flex-column align-items-center justify-content-center gap-1 fw-bold">
+                        <i class="fas fa-file-csv fa-2x mb-1"></i>
+                        <span>Ekspor ke CSV (.csv)</span>
+                        <small class="fw-normal opacity-75" style="font-size: 0.75rem;">Data tabel teks terstandar</small>
+                      </button>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-3">
+                      <button id="btnExportTabJSON" class="btn btn-warning text-dark w-100 py-3 shadow-sm rounded-3 d-flex flex-column align-items-center justify-content-center gap-1 fw-bold">
+                        <i class="fas fa-file-code fa-2x mb-1"></i>
+                        <span>Cadangan JSON (.json)</span>
+                        <small class="fw-normal opacity-75" style="font-size: 0.75rem;">Format objek data terfilter</small>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Live Preview Table -->
+                <div class="card border rounded-3 overflow-hidden">
+                  <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0 text-dark">
+                      <i class="fas fa-table-list text-primary me-2"></i> Pratinjau Butir Soal Terpilih (<span id="exportTableCountDisplay">0</span> Soal)
+                    </h6>
+                    <small class="text-muted">Daftar butir soal yang akan disertakan dalam berkas ekspor</small>
+                  </div>
+                  <div class="table-responsive" style="max-height: 520px; overflow-y: auto;">
+                    <table class="table table-hover align-middle mb-0">
+                      <thead class="table-light sticky-top">
+                        <tr>
+                          <th style="width: 50px;" class="text-center">No</th>
+                          <th style="width: 170px;">Target Ujian</th>
+                          <th>Teks Pertanyaan & Cuplikan Kode</th>
+                          <th style="width: 250px;">Pilihan Jawaban</th>
+                          <th style="width: 90px;" class="text-center">Kunci</th>
+                        </tr>
+                      </thead>
+                      <tbody id="exportPreviewTableBody">
+                        <!-- Populated dynamically -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 4: REKAPITULASI NILAI -->
           <div class="tab-pane fade" id="tab-rekap" role="tabpanel">
             <div class="card border-0 shadow-sm rounded-4 mb-4">
               <div class="card-header bg-white border-bottom py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
@@ -913,7 +1085,7 @@
         </div>
       </div>
     </div>
-  </div>
+
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -1293,17 +1465,497 @@
         });
       }
 
-      // Export bank soal JSON backup
-      btnExportBankJson.addEventListener('click', () => {
-        const jsonStr = JSON.stringify(bankSoal, null, 2);
+      // =========================================================================
+      // TAB 3: MENU KHUSUS EKSPOR SOAL UJIAN
+      // =========================================================================
+      const exportSelectGrade = document.getElementById('exportSelectGrade');
+      const exportSelectExamType = document.getElementById('exportSelectExamType');
+      const exportSelectSubject = document.getElementById('exportSelectSubject');
+      const exportSelectIncludeKeys = document.getElementById('exportSelectIncludeKeys');
+      const exportSearchInput = document.getElementById('exportSearchInput');
+      const exportBadgeCount = document.getElementById('exportBadgeCount');
+      const exportActiveFilterLabel = document.getElementById('exportActiveFilterLabel');
+      const exportTableCountDisplay = document.getElementById('exportTableCountDisplay');
+      const exportPreviewTableBody = document.getElementById('exportPreviewTableBody');
+      const btnResetExportFilters = document.getElementById('btnResetExportFilters');
+
+      const btnExportTabExcel = document.getElementById('btnExportTabExcel');
+      const btnExportTabWord = document.getElementById('btnExportTabWord');
+      const btnExportTabCSV = document.getElementById('btnExportTabCSV');
+      const btnExportTabJSON = document.getElementById('btnExportTabJSON');
+
+      const btnGoToExportTab = document.getElementById('btnGoToExportTab');
+      if (btnGoToExportTab) {
+        btnGoToExportTab.addEventListener('click', () => {
+          const exportTabTrigger = document.getElementById('tab-export-btn');
+          if (exportTabTrigger) {
+            const tab = bootstrap.Tab.getOrCreateInstance(exportTabTrigger);
+            tab.show();
+          }
+        });
+      }
+
+      function getQuestionsForExport(grade, subject, examType, search = '') {
+        return bankSoal.filter(q => {
+          const matchGrade = (grade === 'ALL' || String(q.grade) === String(grade));
+          const matchSubj = (subject === 'ALL' || q.subject.toLowerCase() === subject.toLowerCase());
+          const matchExam = (examType === 'ALL' || q.examType.toLowerCase() === examType.toLowerCase());
+          let matchSearch = true;
+          if (search) {
+            const combinedText = (q.question + ' ' + (q.code || '') + ' ' + (q.explanation || '') + ' ' + Object.values(q.options || {}).join(' ')).toLowerCase();
+            matchSearch = combinedText.includes(search.toLowerCase());
+          }
+          return matchGrade && matchSubj && matchExam && matchSearch;
+        });
+      }
+
+      function buildExportFilename(prefix, grade, subject, examType, ext) {
+        const parts = [prefix];
+        if (subject && subject !== 'ALL') parts.push(subject.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, ''));
+        if (examType && examType !== 'ALL') parts.push(examType);
+        if (grade && grade !== 'ALL') parts.push(`Kelas_${grade}`);
+        parts.push(new Date().toISOString().slice(0, 10));
+        return `${parts.join('_')}.${ext}`;
+      }
+
+      function renderExportPreview() {
+        if (!exportPreviewTableBody) return;
+
+        const grade = exportSelectGrade ? exportSelectGrade.value : 'ALL';
+        const exam = exportSelectExamType ? exportSelectExamType.value : 'ALL';
+        const subj = exportSelectSubject ? exportSelectSubject.value : 'ALL';
+        const search = exportSearchInput ? exportSearchInput.value.trim() : '';
+
+        const matched = getQuestionsForExport(grade, subj, exam, search);
+
+        if (exportBadgeCount) exportBadgeCount.textContent = `${matched.length} Butir Soal`;
+        if (exportTableCountDisplay) exportTableCountDisplay.textContent = matched.length;
+
+        if (exportActiveFilterLabel) {
+          const gradeText = grade !== 'ALL' ? `Kelas ${grade} SMP` : 'Semua Kelas';
+          const examText = exam === 'Midterm' ? 'Midterm (PTS)' : (exam === 'Final' ? 'Final Test (PAS)' : 'Semua Jenis Ujian');
+          const subjText = subj !== 'ALL' ? subj : 'Semua Mata Pelajaran';
+          exportActiveFilterLabel.innerHTML = `Kriteria Terpilih: <strong>${gradeText}</strong> &bull; <strong>${examText}</strong> &bull; <strong>${subjText}</strong> ${search ? `&bull; Cari: "${escapeHtml(search)}"` : ''}`;
+        }
+
+        if (matched.length === 0) {
+          exportPreviewTableBody.innerHTML = `
+            <tr>
+              <td colspan="5" class="text-center py-5 text-muted">
+                <i class="fas fa-search fa-3x mb-3 text-secondary-subtle"></i>
+                <div class="fw-bold fs-6">Tidak Ada Soal Yang Sesuai Kriteria</div>
+                <div class="small mt-1 text-muted">Silakan sesuaikan pilihan Tingkat Kelas, Jenis Ujian, atau Mata Pelajaran pada form di atas.</div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        let html = '';
+        matched.forEach((q, idx) => {
+          const hasCode = q.code && q.code.trim().length > 0;
+          const keyLetter = (q.key || 'A').toUpperCase();
+
+          html += `
+            <tr>
+              <td class="text-center fw-bold text-muted">${idx + 1}</td>
+              <td>
+                <span class="badge bg-secondary-subtle text-dark border d-block mb-1">Kelas ${q.grade} SMP</span>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle d-block mb-1">${escapeHtml(q.subject)}</span>
+                <span class="badge bg-info-subtle text-info border border-info-subtle">${escapeHtml(q.examType)}</span>
+              </td>
+              <td>
+                <div class="fw-medium text-dark mb-1">${escapeHtml(q.question)}</div>
+                ${hasCode ? `
+                  <div class="mt-2 bg-dark p-2 rounded text-light small font-monospace" style="max-height: 100px; overflow-y: auto;">
+                    <code>${escapeHtml(q.code)}</code>
+                  </div>
+                ` : ''}
+                ${q.explanation ? `
+                  <div class="mt-2 text-muted small p-2 bg-light rounded border border-light-subtle">
+                    <i class="fas fa-lightbulb text-warning me-1"></i> <strong>Pembahasan:</strong> ${escapeHtml(q.explanation)}
+                  </div>
+                ` : ''}
+              </td>
+              <td>
+                <div class="small d-flex flex-column gap-1">
+                  <div class="p-1 rounded ${keyLetter === 'A' ? 'bg-success-subtle border border-success-subtle fw-bold' : ''}">
+                    <strong>A.</strong> ${escapeHtml(q.options?.A || '-')}
+                  </div>
+                  <div class="p-1 rounded ${keyLetter === 'B' ? 'bg-success-subtle border border-success-subtle fw-bold' : ''}">
+                    <strong>B.</strong> ${escapeHtml(q.options?.B || '-')}
+                  </div>
+                  <div class="p-1 rounded ${keyLetter === 'C' ? 'bg-success-subtle border border-success-subtle fw-bold' : ''}">
+                    <strong>C.</strong> ${escapeHtml(q.options?.C || '-')}
+                  </div>
+                  <div class="p-1 rounded ${keyLetter === 'D' ? 'bg-success-subtle border border-success-subtle fw-bold' : ''}">
+                    <strong>D.</strong> ${escapeHtml(q.options?.D || '-')}
+                  </div>
+                </div>
+              </td>
+              <td class="text-center">
+                <span class="badge bg-success fs-6 px-2 py-1">${keyLetter}</span>
+              </td>
+            </tr>
+          `;
+        });
+
+        exportPreviewTableBody.innerHTML = html;
+      }
+
+      if (exportSelectGrade) exportSelectGrade.addEventListener('change', renderExportPreview);
+      if (exportSelectExamType) exportSelectExamType.addEventListener('change', renderExportPreview);
+      if (exportSelectSubject) exportSelectSubject.addEventListener('change', renderExportPreview);
+      if (exportSelectIncludeKeys) exportSelectIncludeKeys.addEventListener('change', renderExportPreview);
+      if (exportSearchInput) exportSearchInput.addEventListener('input', renderExportPreview);
+
+      if (btnResetExportFilters) {
+        btnResetExportFilters.addEventListener('click', () => {
+          if (exportSelectGrade) exportSelectGrade.value = 'ALL';
+          if (exportSelectExamType) exportSelectExamType.value = 'ALL';
+          if (exportSelectSubject) exportSelectSubject.value = 'ALL';
+          if (exportSelectIncludeKeys) exportSelectIncludeKeys.checked = true;
+          if (exportSearchInput) exportSearchInput.value = '';
+          renderExportPreview();
+          ExamApp.Toast.show('Kriteria filter ekspor dikembalikan ke default.', 'info');
+        });
+      }
+
+      // Sidebar Tab Event Listener: Re-render when export tab is clicked
+      const tabExportBtn = document.getElementById('tab-export-btn');
+      if (tabExportBtn) {
+        tabExportBtn.addEventListener('shown.bs.tab', () => {
+          renderExportPreview();
+        });
+      }
+
+      function exportQuestionsToExcel(questions, filename, includeKeys = true) {
+        if (!questions || questions.length === 0) {
+          ExamApp.Toast.show('Tidak ada butir soal yang sesuai kriteria untuk diekspor ke Excel.', 'warning');
+          return;
+        }
+
+        const headers = [
+          "No",
+          "Tingkat Kelas",
+          "Mata Pelajaran",
+          "Jenis Ujian",
+          "Pertanyaan Soal",
+          "Cuplikan Kode",
+          "Bahasa Kode",
+          "Pilihan A",
+          "Pilihan B",
+          "Pilihan C",
+          "Pilihan D"
+        ];
+        if (includeKeys) {
+          headers.push("Kunci Jawaban", "Pembahasan / Penjelasan");
+        }
+
+        const rows = [headers];
+        questions.forEach((q, idx) => {
+          const row = [
+            idx + 1,
+            `Kelas ${q.grade} SMP`,
+            q.subject || '',
+            q.examType === 'Midterm' ? 'Midterm (PTS)' : (q.examType === 'Final' ? 'Final Test (PAS)' : (q.examType || '')),
+            q.question || '',
+            q.code || '',
+            q.lang || '',
+            q.options?.A || '',
+            q.options?.B || '',
+            q.options?.C || '',
+            q.options?.D || ''
+          ];
+          if (includeKeys) {
+            row.push(q.key || '', q.explanation || '');
+          }
+          rows.push(row);
+        });
+
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        ws['!cols'] = [
+          { wch: 6 },
+          { wch: 14 },
+          { wch: 28 },
+          { wch: 18 },
+          { wch: 45 },
+          { wch: 25 },
+          { wch: 12 },
+          { wch: 25 },
+          { wch: 25 },
+          { wch: 25 },
+          { wch: 25 },
+          ...(includeKeys ? [{ wch: 8 }, { wch: 35 }] : [])
+        ];
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Soal_Ujian");
+        XLSX.writeFile(wb, filename);
+        ExamApp.AudioEngine.success();
+        ExamApp.Toast.show(`Berhasil mengekspor ${questions.length} butir soal ke Excel (${filename})!`, 'success');
+      }
+
+      function exportQuestionsToWord(questions, filename, includeKeys = true, meta = {}) {
+        if (!questions || questions.length === 0) {
+          ExamApp.Toast.show('Tidak ada butir soal yang sesuai kriteria untuk diekspor ke Word.', 'warning');
+          return;
+        }
+
+        const school = meta.schoolName || 'SMP IT Bunayya Lhokseumawe';
+        const subjTitle = meta.subject && meta.subject !== 'ALL' ? meta.subject : 'Semua Mata Pelajaran';
+        const examTitle = meta.examType === 'Midterm' ? 'Penilaian Tengah Semester (PTS / Midterm)' : (meta.examType === 'Final' ? 'Penilaian Akhir Semester (PAS / Final Test)' : 'Asesmen Sumatif');
+        const gradeTitle = meta.grade && meta.grade !== 'ALL' ? `Kelas ${meta.grade} SMP` : 'Kelas 7, 8, 9 SMP';
+        const duration = currentSettings?.durationMinutes || 60;
+
+        let soalHtml = '';
+        questions.forEach((q, idx) => {
+          const hasCode = q.code && q.code.trim().length > 0;
+          soalHtml += `
+            <div class="soal-item" style="margin-bottom: 16px; page-break-inside: avoid;">
+              <table style="width: 100%; border: none;">
+                <tr>
+                  <td style="width: 28px; vertical-align: top; font-weight: bold;">${idx + 1}.</td>
+                  <td style="vertical-align: top;">
+                    <div style="margin-bottom: 6px;">${escapeHtml(q.question)}</div>
+                    ${hasCode ? `
+                      <pre style="background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px 12px; font-family: 'Courier New', monospace; font-size: 10pt; margin: 6px 0; white-space: pre-wrap;"><code>${escapeHtml(q.code)}</code></pre>
+                    ` : ''}
+                    <div style="margin-left: 8px; margin-top: 6px;">
+                      <div style="margin-bottom: 3px;"><strong>A.</strong> ${escapeHtml(q.options?.A || '-')}</div>
+                      <div style="margin-bottom: 3px;"><strong>B.</strong> ${escapeHtml(q.options?.B || '-')}</div>
+                      <div style="margin-bottom: 3px;"><strong>C.</strong> ${escapeHtml(q.options?.C || '-')}</div>
+                      <div style="margin-bottom: 3px;"><strong>D.</strong> ${escapeHtml(q.options?.D || '-')}</div>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          `;
+        });
+
+        let kunciHtml = '';
+        if (includeKeys) {
+          kunciHtml = `
+            <div style="page-break-before: always; margin-top: 40px; border-top: 2px dashed #333; padding-top: 20px;">
+              <h3 style="text-align: center; margin-bottom: 15px; font-size: 14pt; text-transform: uppercase;">
+                LEMBAR KUNCI JAWABAN & PEMBAHASAN
+              </h3>
+              <p style="text-align: center; font-size: 11pt; margin-bottom: 20px;">
+                Mata Pelajaran: <strong>${escapeHtml(subjTitle)}</strong> | ${escapeHtml(examTitle)} | ${escapeHtml(gradeTitle)}
+              </p>
+              <table style="width: 100%; border-collapse: collapse; font-size: 10pt;" border="1">
+                <thead>
+                  <tr style="background: #e2e8f0;">
+                    <th style="padding: 6px; width: 40px; text-align: center;">No</th>
+                    <th style="padding: 6px; width: 60px; text-align: center;">Kunci</th>
+                    <th style="padding: 6px; width: 80px; text-align: center;">Kelas</th>
+                    <th style="padding: 6px;">Pembahasan / Penjelasan Singkat</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${questions.map((q, idx) => `
+                    <tr>
+                      <td style="padding: 6px; text-align: center; font-weight: bold;">${idx + 1}</td>
+                      <td style="padding: 6px; text-align: center; font-weight: bold; background: #f8fafc;">${escapeHtml(q.key || '-')}</td>
+                      <td style="padding: 6px; text-align: center;">Kelas ${q.grade}</td>
+                      <td style="padding: 6px;">${escapeHtml(q.explanation || '-')}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          `;
+        }
+
+        const docHtml = `
+          <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+          <head>
+            <meta charset="utf-8">
+            <title>${escapeHtml(subjTitle)} - ${escapeHtml(examTitle)}</title>
+            <style>
+              body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.4; color: #111; margin: 20px; }
+              .header-kop { text-align: center; border-bottom: 3px double #000; padding-bottom: 10px; margin-bottom: 16px; }
+              .header-kop h2 { margin: 0; font-size: 15pt; text-transform: uppercase; font-weight: bold; }
+              .header-kop h3 { margin: 4px 0; font-size: 13pt; font-weight: bold; }
+              .header-kop p { margin: 2px 0; font-size: 10pt; font-style: italic; }
+              .meta-box { width: 100%; margin-bottom: 18px; font-size: 11pt; border-bottom: 1px solid #999; padding-bottom: 10px; }
+              .petunjuk { background: #f8fafc; border: 1px solid #cbd5e1; padding: 8px 12px; margin-bottom: 20px; font-size: 10pt; }
+            </style>
+          </head>
+          <body>
+            <div class="header-kop">
+              <h2>${escapeHtml(school)}</h2>
+              <h3>NASKAH SOAL ${escapeHtml(examTitle.toUpperCase())}</h3>
+              <p>Tahun Ajaran 2024/2025</p>
+            </div>
+
+            <table class="meta-box" style="width: 100%; border: none;">
+              <tr>
+                <td style="width: 18%;"><strong>Mata Pelajaran</strong></td>
+                <td style="width: 42%;">: ${escapeHtml(subjTitle)}</td>
+                <td style="width: 15%;"><strong>Hari / Tanggal</strong></td>
+                <td>: ${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</td>
+              </tr>
+              <tr>
+                <td><strong>Tingkat / Kelas</strong></td>
+                <td>: ${escapeHtml(gradeTitle)}</td>
+                <td><strong>Alokasi Waktu</strong></td>
+                <td>: ${duration} Menit</td>
+              </tr>
+              <tr>
+                <td><strong>Jenis Asesmen</strong></td>
+                <td>: ${escapeHtml(examTitle)}</td>
+                <td><strong>Bentuk Soal</strong></td>
+                <td>: Pilihan Ganda (${questions.length} Butir Soal)</td>
+              </tr>
+            </table>
+
+            <div class="petunjuk">
+              <strong>PETUNJUK UMUM:</strong><br>
+              1. Tulislah nama dan nomor peserta Anda pada lembar jawaban yang telah disediakan.<br>
+              2. Periksa dan bacalah setiap butir soal dengan teliti sebelum Anda menjawabnya.<br>
+              3. Pilihlah salah satu jawaban yang paling tepat dengan memberi tanda silang (X) atau menghitamkan pilihan A, B, C, atau D.<br>
+              4. Laporkan kepada pengawas apabila terdapat tulisan yang kurang jelas, rusak, atau jumlah soal yang kurang.
+            </div>
+
+            <h4 style="text-align: center; margin-bottom: 20px; font-size: 12pt; text-decoration: underline;">
+              SOAL PILIHAN GANDA
+            </h4>
+
+            ${soalHtml}
+
+            ${kunciHtml}
+          </body>
+          </html>
+        `;
+
+        const blob = new Blob(['\ufeff', docHtml], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+        ExamApp.AudioEngine.success();
+        ExamApp.Toast.show(`Naskah Ujian Word (${questions.length} butir soal) berhasil diunduh!`, 'success');
+      }
+
+      function exportQuestionsToCSV(questions, filename, includeKeys = true) {
+        if (!questions || questions.length === 0) {
+          ExamApp.Toast.show('Tidak ada butir soal yang sesuai kriteria untuk diekspor ke CSV.', 'warning');
+          return;
+        }
+
+        const formatted = questions.map((q, idx) => {
+          const item = {
+            "No": idx + 1,
+            "Kelas": "Kelas " + q.grade,
+            "Mata Pelajaran": q.subject,
+            "Jenis Ujian": q.examType,
+            "Pertanyaan": q.question,
+            "Cuplikan Kode": q.code || '',
+            "Bahasa": q.lang || '',
+            "Pilihan A": q.options?.A || '',
+            "Pilihan B": q.options?.B || '',
+            "Pilihan C": q.options?.C || '',
+            "Pilihan D": q.options?.D || ''
+          };
+          if (includeKeys) {
+            item["Kunci Jawaban"] = q.key || '';
+            item["Pembahasan"] = q.explanation || '';
+          }
+          return item;
+        });
+
+        const csv = Papa.unparse(formatted);
+        const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+        ExamApp.Toast.show(`Berkas CSV (${questions.length} soal) berhasil diunduh!`, 'success');
+      }
+
+      function exportQuestionsToJSON(questions, filename) {
+        if (!questions || questions.length === 0) {
+          ExamApp.Toast.show('Tidak ada butir soal yang sesuai kriteria untuk diekspor ke JSON.', 'warning');
+          return;
+        }
+
+        const jsonStr = JSON.stringify(questions, null, 2);
         const blob = new Blob([jsonStr], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `Backup_Bank_Soal_CBT_${new Date().toISOString().slice(0, 10)}.json`;
+        a.download = filename;
         a.click();
         URL.revokeObjectURL(url);
-      });
+        ExamApp.Toast.show(`Berkas JSON (${questions.length} butir soal) berhasil diunduh!`, 'success');
+      }
+
+      // Action Handlers from Dedicated Export Tab
+      if (btnExportTabExcel) {
+        btnExportTabExcel.addEventListener('click', () => {
+          const grade = exportSelectGrade ? exportSelectGrade.value : 'ALL';
+          const exam = exportSelectExamType ? exportSelectExamType.value : 'ALL';
+          const subj = exportSelectSubject ? exportSelectSubject.value : 'ALL';
+          const search = exportSearchInput ? exportSearchInput.value.trim() : '';
+          const includeKeys = exportSelectIncludeKeys ? exportSelectIncludeKeys.checked : true;
+
+          const questions = getQuestionsForExport(grade, subj, exam, search);
+          const filename = buildExportFilename('Soal', grade, subj, exam, 'xlsx');
+          exportQuestionsToExcel(questions, filename, includeKeys);
+        });
+      }
+
+      if (btnExportTabWord) {
+        btnExportTabWord.addEventListener('click', () => {
+          const grade = exportSelectGrade ? exportSelectGrade.value : 'ALL';
+          const exam = exportSelectExamType ? exportSelectExamType.value : 'ALL';
+          const subj = exportSelectSubject ? exportSelectSubject.value : 'ALL';
+          const search = exportSearchInput ? exportSearchInput.value.trim() : '';
+          const includeKeys = exportSelectIncludeKeys ? exportSelectIncludeKeys.checked : true;
+
+          const questions = getQuestionsForExport(grade, subj, exam, search);
+          const filename = buildExportFilename('Naskah_Soal', grade, subj, exam, 'doc');
+          exportQuestionsToWord(questions, filename, includeKeys, {
+            schoolName: currentSettings?.schoolName,
+            subject: subj,
+            examType: exam,
+            grade: grade
+          });
+        });
+      }
+
+      if (btnExportTabCSV) {
+        btnExportTabCSV.addEventListener('click', () => {
+          const grade = exportSelectGrade ? exportSelectGrade.value : 'ALL';
+          const exam = exportSelectExamType ? exportSelectExamType.value : 'ALL';
+          const subj = exportSelectSubject ? exportSelectSubject.value : 'ALL';
+          const search = exportSearchInput ? exportSearchInput.value.trim() : '';
+          const includeKeys = exportSelectIncludeKeys ? exportSelectIncludeKeys.checked : true;
+
+          const questions = getQuestionsForExport(grade, subj, exam, search);
+          const filename = buildExportFilename('Soal', grade, subj, exam, 'csv');
+          exportQuestionsToCSV(questions, filename, includeKeys);
+        });
+      }
+
+      if (btnExportTabJSON) {
+        btnExportTabJSON.addEventListener('click', () => {
+          const grade = exportSelectGrade ? exportSelectGrade.value : 'ALL';
+          const exam = exportSelectExamType ? exportSelectExamType.value : 'ALL';
+          const subj = exportSelectSubject ? exportSelectSubject.value : 'ALL';
+          const search = exportSearchInput ? exportSearchInput.value.trim() : '';
+
+          const questions = getQuestionsForExport(grade, subj, exam, search);
+          const filename = buildExportFilename('Backup_Soal', grade, subj, exam, 'json');
+          exportQuestionsToJSON(questions, filename);
+        });
+      }
 
       // Muat / Pulihkan Bank Soal Resmi (360 Soal: Informatika & Web Programming Kelas 7, 8, 9)
       const btnReloadOfficialBank = document.getElementById('btnReloadOfficialBank');
@@ -2126,6 +2778,7 @@ Pembahasan: Tag <h1> adalah heading tingkat tertinggi dengan ukuran teks terbesa
       // Initial Renders
       renderClassificationMatrix();
       renderBankTable();
+      renderExportPreview();
       renderRekapTable();
       populateSettingsForm();
     });

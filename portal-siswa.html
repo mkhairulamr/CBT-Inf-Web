@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Siswa - Hasil Ujian & Rapor Nilai</title>
+  <meta name="description" content="Portal Siswa Mandiri untuk melihat hasil ujian, riwayat nilai, dan cetak lembar hasil belajar siswa dengan sistem autentikasi bertahap.">
+  <meta property="og:title" content="Portal Siswa - Hasil Ujian & Rapor Nilai">
+  <meta property="og:description" content="Portal Siswa Mandiri untuk melihat hasil ujian, riwayat nilai, dan cetak lembar hasil belajar siswa dengan sistem autentikasi bertahap.">
+  <meta property="og:type" content="website">
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome 6 Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary-color: #0f172a;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #ef4444;
+      --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+      --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+      --card-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f1f5f9;
+      color: #1e293b;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navbar */
+    .portal-navbar {
+      background: #0f172a;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Card Styling */
+    .custom-card {
+      background: #ffffff;
+      border-radius: 1rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: var(--card-shadow);
+      transition: all 0.25s ease-in-out;
+    }
+
+    /* Step indicator in Login */
+    .step-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      background: #e2e8f0;
+      color: #475569;
+      transition: all 0.2s ease;
+    }
+    .step-active .step-badge {
+      background: var(--primary-color);
+      color: #ffffff;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+    }
+
+    /* Stats Card */
+    .stat-card {
+      border-radius: 1rem;
+      padding: 1.25rem;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: var(--card-shadow);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--card-shadow-hover);
+    }
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+
+    /* Status Badges */
+    .badge-status-sangat-baik {
+      background-color: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+    }
+    .badge-status-lulus {
+      background-color: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+    .badge-status-remedial {
+      background-color: #fef2f2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+    /* Score Pill */
+    .score-circle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.15rem;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+    }
+
+    /* Table styling */
+    .custom-table th {
+      background-color: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-top: none;
+      padding: 0.85rem 1rem;
+    }
+    .custom-table td {
+      vertical-align: middle;
+      padding: 0.85rem 1rem;
+      color: #1e293b;
+      font-size: 0.95rem;
+    }
+
+    /* Animation */
+    .fade-in {
+      animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Print Header & Printable Area */
+    #printableSheet {
+      display: none;
+    }
+
+    /* Print Preview in Modal */
+    #pdfPreviewContainer {
+      font-family: 'Times New Roman', Times, serif;
+      color: #000;
+      background: #ffffff;
+    }
+    #pdfPrintableClone .print-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    #pdfPrintableClone .print-table th, #pdfPrintableClone .print-table td {
+      border: 1px solid #000;
+      padding: 6px 10px;
+      font-size: 11pt;
+    }
+    #pdfPrintableClone .print-table th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+      text-align: center;
+    }
+    #pdfPrintableClone .kop-surat {
+      border-bottom: 3px double #000;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    @media print {
+      body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        font-family: 'Times New Roman', Times, serif;
+      }
+      .no-print, .portal-navbar, #loginSection, #dashboardActions, footer, .modal, .modal-backdrop, .toast-container {
+        display: none !important;
+      }
+      #dashboardSection {
+        display: none !important;
+      }
+      #printableSheet {
+        display: block !important;
+      }
+      .print-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+      }
+      .print-table th, .print-table td {
+        border: 1px solid #000;
+        padding: 6px 10px;
+        font-size: 11pt;
+      }
+      .print-table th {
+        background-color: #f0f0f0 !important;
+        font-weight: bold;
+        text-align: center;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .kop-surat {
+        border-bottom: 3px double #000;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="portal-navbar navbar navbar-expand-lg navbar-dark py-2.5">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="portal-siswa.html">
+        <div class="bg-primary text-white rounded-3 p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px;">
+          <i class="fas fa-user-graduate fa-lg"></i>
+        </div>
+        <div>
+          <div class="fw-bold fs-6 lh-1 text-white">Portal Siswa</div>
+          <small class="text-secondary-subtle" style="font-size: 0.75rem;">Hasil Belajar & Rapor Ujian Online</small>
+        </div>
+      </a>
+
+      <div class="d-flex align-items-center gap-2 ms-auto">
+        <!-- Direct Quick Links -->
+        <a href="index.html" class="btn btn-outline-light btn-sm rounded-pill px-3 d-flex align-items-center gap-1.5" title="Kembali ke Halaman Masuk Ujian">
+          <i class="fas fa-pen-to-square"></i>
+          <span class="d-none d-sm-inline">Ujian Online</span>
+        </a>
+        <a href="admin.html" class="btn btn-outline-secondary btn-sm text-light rounded-pill px-3 d-flex align-items-center gap-1.5" title="Masuk ke Portal Guru & Admin">
+          <i class="fas fa-user-shield"></i>
+          <span class="d-none d-sm-inline">Portal Guru</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="container py-4 flex-grow-1">
+
+    <!-- ========================================================================= -->
+    <!-- SECTION 1: HALAMAN LOGIN SISWA (SISTEM AUTENTIKASI BERTAHAP) -->
+    <!-- ========================================================================= -->
+    <section id="loginSection" class="fade-in">
+      <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 col-sm-11">
+          
+          <div class="custom-card p-4 p-md-5">
+            <!-- Header Card -->
+            <div class="text-center mb-4">
+              <div class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mb-3" style="width: 64px; height: 64px;">
+                <i class="fas fa-id-card-clip fa-2x"></i>
+              </div>
+              <h3 class="fw-bold text-dark mb-1">Masuk Portal Siswa</h3>
+              <p class="text-muted small mb-2">Pilih kelas, pilih nama Anda, dan verifikasi tanggal lahir untuk mengakses rekap nilai & hasil ujian.</p>
+              
+              <!-- Active Data Badges -->
+              <div class="d-flex justify-content-center gap-2 flex-wrap mt-2">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1.5 rounded-pill">
+                  <i class="fas fa-users me-1"></i> <span id="badgeStudentCount">0</span> Siswa
+                </span>
+                <span class="badge bg-secondary-subtle text-dark border px-3 py-1.5 rounded-pill">
+                  <i class="fas fa-layer-group me-1 text-primary"></i> <span id="badgeClassCount">0</span> Rombel
+                </span>
+              </div>
+            </div>
+
+            <!-- Error Alert -->
+            <div id="loginErrorAlert" class="alert alert-danger d-none align-items-start gap-2 shadow-sm rounded-3 py-2.5" role="alert">
+              <i class="fas fa-circle-exclamation mt-1"></i>
+              <div id="loginErrorMessage">Tanggal lahir tidak sesuai. Silakan periksa kembali.</div>
+            </div>
+
+            <form id="formStudentLogin" novalidate autocomplete="off">
+              
+              <!-- LANGKAH 1: PILIH KELAS -->
+              <div class="mb-4">
+                <label for="selectClass" class="form-label fw-bold d-flex align-items-center gap-2 text-dark mb-1">
+                  <span class="step-badge">1</span>
+                  <span>Pilih Kelas</span>
+                  <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light text-muted border-end-0">
+                    <i class="fas fa-layer-group text-primary"></i>
+                  </span>
+                  <select class="form-select border-start-0 py-2.5 ps-0" id="selectClass" required>
+                    <option value="" selected disabled>-- Memuat Daftar Kelas... --</option>
+                  </select>
+                </div>
+                <div class="form-text text-muted small">Daftar kelas otomatis disesuaikan dari data siswa terdaftar.</div>
+              </div>
+
+              <!-- LANGKAH 2: PILIH NAMA SISWA -->
+              <div class="mb-4">
+                <label for="selectStudent" class="form-label fw-bold d-flex align-items-center gap-2 text-dark mb-1">
+                  <span class="step-badge" id="stepBadgeStudent">2</span>
+                  <span>Pilih Nama Siswa</span>
+                  <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light text-muted border-end-0">
+                    <i class="fas fa-user-graduate text-primary"></i>
+                  </span>
+                  <select class="form-select border-start-0 py-2.5 ps-0" id="selectStudent" disabled required>
+                    <option value="" selected disabled>-- Pilih kelas terlebih dahulu --</option>
+                  </select>
+                </div>
+                <div class="form-text text-muted small" id="studentHelperText">Pilih kelas di langkah 1 untuk menampilkan daftar nama siswa.</div>
+              </div>
+
+              <!-- LANGKAH 3: VERIFIKASI TANGGAL LAHIR -->
+              <div class="mb-4">
+                <label for="inputDob" class="form-label fw-bold d-flex align-items-center gap-2 text-dark mb-1">
+                  <span class="step-badge" id="stepBadgeDob">3</span>
+                  <span>Verifikasi Tanggal Lahir</span>
+                  <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light text-muted border-end-0">
+                    <i class="fas fa-calendar-day text-primary"></i>
+                  </span>
+                  <input type="date" class="form-control border-start-0 py-2.5 ps-0" id="inputDob" placeholder="YYYY-MM-DD" required disabled>
+                </div>
+                <div class="form-text text-muted small">Masukkan tanggal lahir Anda sesuai data yang tercatat di sekolah.</div>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="d-grid mt-4">
+                <button type="submit" id="btnSubmitLogin" class="btn btn-primary py-2.5 fw-bold rounded-3 shadow-sm d-flex align-items-center justify-content-center gap-2" disabled>
+                  <i class="fas fa-arrow-right-to-bracket"></i>
+                  <span>Buka Hasil Ujian Saya</span>
+                </button>
+              </div>
+            </form>
+
+            <!-- Link Bantuan Data Siswa Terdaftar -->
+            <div class="mt-4 pt-3 border-top text-center">
+              <button type="button" class="btn btn-link text-decoration-none text-muted small p-0" data-bs-toggle="modal" data-bs-target="#demoAccountModal">
+                <i class="fas fa-users-viewfinder me-1 text-primary"></i> Lihat Daftar Siswa Terdaftar (6 Rombel)
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Info Box -->
+          <div class="text-center text-muted small mt-3">
+            <i class="fas fa-shield-halved me-1 text-success"></i> Sistem Autentikasi Mandiri Berbasis Tanggal Lahir Siswa
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- SECTION 2: DASHBOARD PORTAL SISWA -->
+    <!-- ========================================================================= -->
+    <section id="dashboardSection" class="d-none fade-in">
+      
+      <!-- Top Welcome Banner -->
+      <div class="custom-card p-4 mb-4 border-0" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff;">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+          
+          <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold fs-4 shadow" style="width: 60px; height: 60px;" id="userAvatar">
+              -
+            </div>
+            <div>
+              <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1" id="dashGreeting">Selamat Datang</span>
+                <span class="badge bg-secondary-subtle text-light rounded-pill px-2.5 py-1" id="dashClassBadge">Kelas -</span>
+                <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 py-1" id="dashNisnBadge">NISN: -</span>
+              </div>
+              <h3 class="fw-bold mb-0 text-white" id="dashStudentName">Nama Siswa</h3>
+              <p class="text-secondary-subtle small mb-0 mt-0.5">
+                <i class="fas fa-school me-1"></i> SMP IT Bunayya Lhokseumawe &bull; Tahun Ajaran 2025/2026
+              </p>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="d-flex align-items-center gap-2 flex-wrap" id="dashboardActions">
+            <button type="button" class="btn btn-outline-light btn-sm px-3 py-2 rounded-3 fw-semibold d-flex align-items-center gap-1.5" id="btnRefreshExams" title="Segarkan hasil ujian dari penyimpanan laptop">
+              <i class="fas fa-arrows-rotate"></i>
+              <span>Segarkan Data</span>
+            </button>
+            <button type="button" class="btn btn-light fw-bold btn-sm px-3 py-2 rounded-3 shadow-sm d-flex align-items-center gap-2" id="btnPrintReport">
+              <i class="fas fa-print text-primary"></i>
+              <span>Cetak / Simpan PDF</span>
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm px-3 py-2 rounded-3 fw-bold d-flex align-items-center gap-2" id="btnLogout">
+              <i class="fas fa-power-off"></i>
+              <span>Keluar</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Ringkasan Akademik (Stats Cards) -->
+      <div class="row g-3 mb-4">
+        
+        <!-- Rata-rata Nilai -->
+        <div class="col-6 col-lg-3">
+          <div class="stat-card h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="text-muted small fw-bold">RATA-RATA NILAI</span>
+              <div class="stat-icon bg-primary-subtle text-primary">
+                <i class="fas fa-chart-line"></i>
+              </div>
+            </div>
+            <div class="d-flex align-items-baseline gap-2">
+              <h2 class="fw-bold mb-0 text-dark" id="statAverage">0</h2>
+              <span class="text-muted small">/ 100</span>
+            </div>
+            <div class="mt-2 small text-muted d-flex align-items-center gap-1" id="statAverageNote">
+              <span class="badge bg-success-subtle text-success border border-success-subtle" id="statGradePredicate">Sangat Baik</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Jumlah Ujian Terikut -->
+        <div class="col-6 col-lg-3">
+          <div class="stat-card h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="text-muted small fw-bold">UJIAN TERIKUT</span>
+              <div class="stat-icon bg-info-subtle text-info">
+                <i class="fas fa-book-bookmark"></i>
+              </div>
+            </div>
+            <div class="d-flex align-items-baseline gap-2">
+              <h2 class="fw-bold mb-0 text-dark" id="statTotalExams">0</h2>
+              <span class="text-muted small">Mata Pelajaran</span>
+            </div>
+            <div class="mt-2 small text-muted">
+              <i class="fas fa-check-circle text-info me-1"></i> Terdaftar di sistem
+            </div>
+          </div>
+        </div>
+
+        <!-- Tingkat Kelulusan -->
+        <div class="col-6 col-lg-3">
+          <div class="stat-card h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="text-muted small fw-bold">STATUS KELULUSAN</span>
+              <div class="stat-icon bg-success-subtle text-success">
+                <i class="fas fa-award"></i>
+              </div>
+            </div>
+            <div class="d-flex align-items-baseline gap-2">
+              <h2 class="fw-bold mb-0 text-success" id="statPassed">0</h2>
+              <span class="text-muted small" id="statRemedialCount">/ 0 Remedial</span>
+            </div>
+            <div class="mt-2 small text-muted" id="statPassRate">
+              Ketuntasan 100%
+            </div>
+          </div>
+        </div>
+
+        <!-- Nilai Tertinggi & Terendah -->
+        <div class="col-6 col-lg-3">
+          <div class="stat-card h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="text-muted small fw-bold">SKOR EKSTREM</span>
+              <div class="stat-icon bg-warning-subtle text-warning">
+                <i class="fas fa-trophy"></i>
+              </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <span class="text-muted small d-block" style="font-size: 0.75rem;">Tertinggi</span>
+                <span class="fw-bold text-success fs-5" id="statHighest">0</span>
+              </div>
+              <div class="vr mx-2"></div>
+              <div>
+                <span class="text-muted small d-block" style="font-size: 0.75rem;">Terendah</span>
+                <span class="fw-bold text-danger fs-5" id="statLowest">0</span>
+              </div>
+            </div>
+            <div class="mt-2 small text-muted text-truncate" id="statHighestSubject">
+              -
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Tabel Hasil Ujian Siswa -->
+      <div class="custom-card p-4">
+        
+        <!-- Toolbar Filter & Search -->
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4 pb-3 border-bottom">
+          <div>
+            <h5 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+              <i class="fas fa-file-lines text-primary"></i>
+              <span>Daftar Hasil Ujian & Rekap Nilai</span>
+            </h5>
+            <p class="text-muted small mb-0">Rincian nilai setiap mata pelajaran yang telah diselesaikan oleh siswa.</p>
+          </div>
+
+          <!-- Controls Filter -->
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <!-- Search Mapel -->
+            <div class="input-group input-group-sm" style="min-width: 200px;">
+              <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+              <input type="text" class="form-control" id="searchSubject" placeholder="Cari mata pelajaran...">
+            </div>
+
+            <!-- Filter Semester -->
+            <select class="form-select form-select-sm" id="filterSemester" style="width: auto;">
+              <option value="ALL">Semua Semester</option>
+            </select>
+
+            <!-- Filter Status -->
+            <select class="form-select form-select-sm" id="filterStatus" style="width: auto;">
+              <option value="ALL">Semua Status</option>
+              <option value="Sangat Baik">Sangat Baik</option>
+              <option value="Lulus">Lulus</option>
+              <option value="Remedial">Remedial</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="table-responsive">
+          <table class="table custom-table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th style="width: 50px;" class="text-center">No</th>
+                <th>Mata Pelajaran</th>
+                <th>Semester</th>
+                <th>Tanggal Ujian</th>
+                <th class="text-center">Nilai / Skor</th>
+                <th class="text-center">KKM</th>
+                <th class="text-center">Status</th>
+                <th class="text-center" style="width: 120px;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="examResultTableBody">
+              <!-- Dynamically populated via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyResultState" class="text-center py-5 d-none">
+          <div class="text-muted mb-2"><i class="fas fa-laptop-file fa-3x text-primary opacity-50"></i></div>
+          <h6 class="fw-bold text-dark" id="emptyResultHeading">Belum Ada Hasil Ujian Pada Laptop Ini</h6>
+          <p class="text-muted small mb-3" id="emptyResultSubtext">Data hasil ujian akan otomatis tampil di sini segera setelah Anda menyelesaikan sesi ujian online CBT di laptop ini.</p>
+          <a href="index.html" class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm">
+            <i class="fas fa-play me-1"></i> Buka Lembar Ujian CBT
+          </a>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: DETAIL BREAKDOWN NILAI -->
+  <!-- ========================================================================= -->
+  <div class="modal fade" id="scoreDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header border-0 pb-0">
+          <div>
+            <h5 class="modal-title fw-bold text-dark" id="modalMapelTitle">Matematika</h5>
+            <small class="text-muted" id="modalExamDate">10 Maret 2026</small>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body py-4">
+          
+          <div class="d-flex align-items-center justify-content-between p-3 rounded-3 bg-light mb-3">
+            <div>
+              <span class="text-muted small d-block">Skor Akhir:</span>
+              <h2 class="fw-bold text-primary mb-0" id="modalFinalScore">88</h2>
+            </div>
+            <div class="text-end">
+              <span class="text-muted small d-block">Status Kelulusan:</span>
+              <span class="badge px-3 py-2 rounded-pill fw-bold" id="modalStatusBadge">Lulus</span>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <h6 class="fw-bold text-dark mb-1"><i class="fas fa-chart-pie text-primary me-2"></i>Rincian Breakdown & Analisis:</h6>
+            <div class="p-3 bg-light rounded-3 text-secondary" id="modalDetailBreakdown" style="font-size: 0.92rem; line-height: 1.6;">
+              Pilihan Ganda: 48/50, Esai: 40/50. Pemahaman aljabar dan geometri sangat baik.
+            </div>
+          </div>
+
+          <div class="alert alert-info py-2 px-3 small d-flex align-items-center gap-2 mb-0 rounded-3">
+            <i class="fas fa-info-circle"></i>
+            <span>Nilai di atas telah tervalidasi oleh guru mata pelajaran dan sistem CBT.</span>
+          </div>
+
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-secondary btn-sm px-4 rounded-pill" data-bs-dismiss="modal">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: DAFTAR DATA SISWA TERDAFTAR -->
+  <!-- ========================================================================= -->
+  <div class="modal fade" id="demoAccountModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header border-bottom">
+          <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2">
+            <i class="fas fa-users text-primary"></i>
+            <span>Daftar Siswa Terdaftar di Sistem</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <p class="text-muted small mb-3">
+            Berikut adalah data siswa yang saat ini aktif dalam sistem portal siswa:
+          </p>
+          <div class="table-responsive">
+            <table class="table table-sm table-bordered align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Kelas</th>
+                  <th>Nama Siswa</th>
+                  <th>Tanggal Lahir (Password)</th>
+                  <th>Jumlah Mapel</th>
+                  <th class="text-center">Aksi Cepat</th>
+                </tr>
+              </thead>
+              <tbody id="demoAccountTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+          <div class="alert alert-light border small text-muted mt-3 mb-0">
+            <i class="fas fa-school text-primary me-1"></i>
+            <strong>Catatan Guru / Pengawas:</strong> Seluruh data 139 siswa dari 6 rombel telah terdaftar dalam sistem dan siap digunakan untuk akses login rapor hasil ujian.
+          </div>
+        </div>
+        <div class="modal-footer border-top">
+          <button type="button" class="btn btn-secondary btn-sm rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: CETAK & SIMPAN PDF LEMBAR RAPOR -->
+  <!-- ========================================================================= -->
+  <div class="modal fade" id="printReportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header border-bottom bg-light">
+          <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2">
+            <i class="fas fa-file-pdf text-danger"></i>
+            <span>Cetak & Simpan PDF Lembar Rapor Hasil Ujian</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-3 p-md-4">
+          <div class="alert alert-info d-flex align-items-center justify-content-between flex-wrap gap-2 py-2.5 px-3 mb-3 rounded-3 small">
+            <div>
+              <i class="fas fa-info-circle me-1"></i>
+              Pratinjau lembar rapor resmi siswa. Anda dapat mengunduh berkas PDF (.pdf) atau mencetak langsung.
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <button type="button" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold" id="modalBtnDirectPrint">
+                <i class="fas fa-print me-1"></i> Cetak Dokumen
+              </button>
+              <button type="button" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold shadow-sm" id="modalBtnDownloadPdf">
+                <i class="fas fa-download me-1"></i> Unduh Berkas PDF
+              </button>
+            </div>
+          </div>
+          
+          <!-- Live Preview Container -->
+          <div class="border rounded-3 p-3 p-md-4 bg-white shadow-sm" id="pdfPreviewContainer" style="max-height: 520px; overflow-y: auto;">
+            <div id="pdfPrintableClone"></div>
+          </div>
+        </div>
+        <div class="modal-footer border-top bg-light d-flex justify-content-between flex-wrap gap-2">
+          <button type="button" class="btn btn-secondary btn-sm rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold" id="modalBtnDirectPrint2">
+              <i class="fas fa-print me-1"></i> Cetak Dokumen
+            </button>
+            <button type="button" class="btn btn-danger btn-sm rounded-pill px-4 fw-bold shadow-sm" id="modalBtnDownloadPdf2">
+              <i class="fas fa-file-pdf me-1"></i> Unduh Berkas PDF Resmi
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: KONFIRMASI KELUAR -->
+  <!-- ========================================================================= -->
+  <div class="modal fade" id="logoutConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content border-0 shadow-lg rounded-4 text-center p-3">
+        <div class="modal-body py-3">
+          <div class="d-inline-flex align-items-center justify-content-center bg-danger-subtle text-danger rounded-circle mb-3" style="width: 56px; height: 56px;">
+            <i class="fas fa-arrow-right-from-bracket fa-2x"></i>
+          </div>
+          <h5 class="fw-bold text-dark mb-2">Keluar Portal Siswa?</h5>
+          <p class="text-muted small mb-0">Sesi akun Anda akan diakhiri dan kembali ke formulir login.</p>
+        </div>
+        <div class="d-flex justify-content-center gap-2 pt-2 border-top">
+          <button type="button" class="btn btn-light btn-sm rounded-pill px-3" data-bs-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-danger btn-sm rounded-pill px-4 fw-bold" id="btnConfirmLogoutAction">
+            <i class="fas fa-power-off me-1"></i> Ya, Keluar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- TEMPLATE CETAK RESMI (PRINTABLE SHEET) -->
+  <!-- ========================================================================= -->
+  <div id="printableSheet">
+    <!-- Kop Surat Sekolah -->
+    <div class="kop-surat">
+      <div style="font-size: 15pt; font-weight: bold; text-transform: uppercase;">YAYASAN PENDIDIKAN ISLAM BUNAYYA</div>
+      <div style="font-size: 18pt; font-weight: bold; text-transform: uppercase; margin: 2px 0;">SMP IT BUNAYYA LHOKSEUMAWE</div>
+      <div style="font-size: 10pt; font-style: italic;">
+        Jl. Merdeka No. 45, Simpang Empat, Banda Sakti, Kota Lhokseumawe, Aceh | Telp: (0645) 43210 | Website: smpit-bunayya.sch.id
+      </div>
+    </div>
+
+    <div style="text-align: center; margin: 15px 0 20px 0;">
+      <h3 style="font-weight: bold; text-decoration: underline; margin-bottom: 3px; font-size: 14pt;">LEMBAR HASIL UJIAN SISWA (RAPOR SEMENTARA)</h3>
+      <span style="font-size: 11pt;" id="printSemesterTitle">Tahun Ajaran 2025/2026</span>
+    </div>
+
+    <!-- Data Identitas Siswa -->
+    <table style="width: 100%; margin-bottom: 15px; font-size: 11pt;">
+      <tr>
+        <td style="width: 18%; font-weight: bold;">Nama Siswa</td>
+        <td style="width: 2%;">:</td>
+        <td style="width: 35%;" id="printStudentName">-</td>
+        <td style="width: 18%; font-weight: bold;">Kelas</td>
+        <td style="width: 2%;">:</td>
+        <td style="width: 25%;" id="printStudentClass">-</td>
+      </tr>
+      <tr>
+        <td style="font-weight: bold;">NISN / ID</td>
+        <td>:</td>
+        <td id="printStudentNisn">-</td>
+        <td style="font-weight: bold;">Tanggal Cetak</td>
+        <td>:</td>
+        <td id="printDateNow">-</td>
+      </tr>
+    </table>
+
+    <!-- Tabel Nilai Cetak -->
+    <table class="print-table">
+      <thead>
+        <tr>
+          <th style="width: 40px;">No</th>
+          <th>Mata Pelajaran</th>
+          <th style="width: 130px;">Semester</th>
+          <th style="width: 100px;">Tanggal Ujian</th>
+          <th style="width: 70px;">KKM</th>
+          <th style="width: 80px;">Nilai / Skor</th>
+          <th style="width: 110px;">Status Ketuntasan</th>
+        </tr>
+      </thead>
+      <tbody id="printTableBody">
+        <!-- Injected via JS -->
+      </tbody>
+      <tfoot>
+        <tr style="font-weight: bold; background-color: #f9f9f9;">
+          <td colspan="5" style="text-align: right; padding-right: 15px;">Rata-Rata Nilai Keseluruhan:</td>
+          <td style="text-align: center;" id="printAverageScore">-</td>
+          <td style="text-align: center;" id="printOverallStatus">-</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <!-- Tanda Tangan -->
+    <div style="margin-top: 40px; width: 100%;">
+      <table style="width: 100%; text-align: center; font-size: 11pt;">
+        <tr>
+          <td style="width: 50%;">
+            Mengetahui,<br>
+            Orang Tua / Wali Siswa,
+            <br><br><br><br>
+            ( .................................................. )
+          </td>
+          <td style="width: 50%;">
+            Lhokseumawe, <span id="printSignDate">17 Oktober 2026</span><br>
+            Wali Kelas,
+            <br><br><br><br>
+            <strong>( Ust. M. Ridwan, S.Pd.I )</strong><br>
+            NIP. 19850612 201001 1 012
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-top py-3 mt-auto text-center text-muted small">
+    <div class="container d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+      <div>&copy; 2026 <strong>SMP IT Bunayya Lhokseumawe</strong>. Portal Siswa & CBT Multi-Format.</div>
+      <div>
+        <a href="index.html" class="text-decoration-none text-muted me-3">Ujian Online</a>
+        <a href="admin.html" class="text-decoration-none text-muted">Portal Admin</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1150;">
+    <div id="portalToast" class="toast align-items-center text-white bg-dark border-0 shadow-lg rounded-3" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body d-flex align-items-center gap-2 py-3" id="portalToastMessage">
+          <i class="fas fa-info-circle text-info"></i>
+          <span>Pemberitahuan</span>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- html2pdf.js for client-side PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <!-- Load Data Siswa Database -->
+  <script src="js/dataSiswa.js"></script>
+
+  <!-- Script Logika Portal Siswa -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Elements
+      const loginSection = document.getElementById('loginSection');
+      const dashboardSection = document.getElementById('dashboardSection');
+      const formStudentLogin = document.getElementById('formStudentLogin');
+      const selectClass = document.getElementById('selectClass');
+      const selectStudent = document.getElementById('selectStudent');
+      const inputDob = document.getElementById('inputDob');
+      const btnSubmitLogin = document.getElementById('btnSubmitLogin');
+      const loginErrorAlert = document.getElementById('loginErrorAlert');
+      const loginErrorMessage = document.getElementById('loginErrorMessage');
+      const studentHelperText = document.getElementById('studentHelperText');
+      const stepBadgeStudent = document.getElementById('stepBadgeStudent');
+      const stepBadgeDob = document.getElementById('stepBadgeDob');
+      const btnLogout = document.getElementById('btnLogout');
+      const btnPrintReport = document.getElementById('btnPrintReport');
+      const demoAccountTableBody = document.getElementById('demoAccountTableBody');
+
+      // Dashboard Elements
+      const userAvatar = document.getElementById('userAvatar');
+      const dashGreeting = document.getElementById('dashGreeting');
+      const dashStudentName = document.getElementById('dashStudentName');
+      const dashClassBadge = document.getElementById('dashClassBadge');
+      const dashNisnBadge = document.getElementById('dashNisnBadge');
+      const statAverage = document.getElementById('statAverage');
+      const statGradePredicate = document.getElementById('statGradePredicate');
+      const statTotalExams = document.getElementById('statTotalExams');
+      const statPassed = document.getElementById('statPassed');
+      const statRemedialCount = document.getElementById('statRemedialCount');
+      const statPassRate = document.getElementById('statPassRate');
+      const statHighest = document.getElementById('statHighest');
+      const statLowest = document.getElementById('statLowest');
+      const statHighestSubject = document.getElementById('statHighestSubject');
+      const examResultTableBody = document.getElementById('examResultTableBody');
+      const emptyResultState = document.getElementById('emptyResultState');
+      const searchSubject = document.getElementById('searchSubject');
+      const filterSemester = document.getElementById('filterSemester');
+      const filterStatus = document.getElementById('filterStatus');
+
+      // State
+      let currentStudent = null;
+      let rawStudentData = [];
+
+      // Badge elements
+      const badgeStudentCount = document.getElementById('badgeStudentCount');
+      const badgeClassCount = document.getElementById('badgeClassCount');
+
+      // Init Student Data: Menggunakan database resmi 139 siswa 6 rombel langsung tanpa menu impor
+      function initStudentData() {
+        // Bersihkan sisa data impor kustom lama di browser siswa jika ada
+        try {
+          localStorage.removeItem('PORTAL_DATA_SISWA');
+        } catch (e) {}
+
+        if (window.DATA_SISWA && Array.isArray(window.DATA_SISWA) && window.DATA_SISWA.length > 0) {
+          rawStudentData = window.DATA_SISWA;
+          updateBadges();
+        } else {
+          // Fallback memuat data dari students.json
+          fetch('students.json')
+            .then(res => res.json())
+            .then(data => {
+              if (Array.isArray(data) && data.length > 0) {
+                rawStudentData = data;
+                updateBadges();
+                populateClassDropdown();
+                populateDemoAccountsTable();
+              }
+            })
+            .catch(err => {
+              console.warn('Gagal memuat students.json fallback:', err);
+            });
+          rawStudentData = [];
+        }
+        updateBadges();
+      }
+
+      function updateBadges() {
+        const total = rawStudentData.length;
+        const classes = Array.from(new Set(rawStudentData.map(s => s.kelas).filter(Boolean)));
+        if (badgeStudentCount) badgeStudentCount.textContent = total;
+        if (badgeClassCount) badgeClassCount.textContent = classes.length;
+      }
+      initStudentData();
+
+      // =========================================================================
+      // LANGKAH 1: POPULATE DAFTAR KELAS UNIK DARI DATA SISWA
+      // =========================================================================
+      function populateClassDropdown() {
+        selectClass.innerHTML = '<option value="" selected disabled>-- Pilih Kelas Anda --</option>';
+        
+        if (!rawStudentData || rawStudentData.length === 0) {
+          selectClass.innerHTML = '<option value="" disabled selected>-- Belum Ada Data Siswa Terdaftar --</option>';
+          selectClass.disabled = true;
+          selectStudent.disabled = true;
+          selectStudent.innerHTML = '<option value="" selected disabled>-- Tidak ada siswa --</option>';
+          inputDob.disabled = true;
+          inputDob.value = '';
+          btnSubmitLogin.disabled = true;
+          return;
+        }
+
+        selectClass.disabled = false;
+
+        // Urutkan kelas sesuai tingkatan VII, VIII, IX
+        const gradeRank = (cls) => {
+          const upper = String(cls).toUpperCase();
+          if (upper.startsWith('VII') || upper.startsWith('7')) return 7;
+          if (upper.startsWith('VIII') || upper.startsWith('8')) return 8;
+          if (upper.startsWith('IX') || upper.startsWith('9')) return 9;
+          return 99;
+        };
+
+        const uniqueClasses = Array.from(new Set(rawStudentData.map(s => s.kelas).filter(Boolean))).sort((a, b) => {
+          const rankA = gradeRank(a);
+          const rankB = gradeRank(b);
+          if (rankA !== rankB) return rankA - rankB;
+          return a.localeCompare(b, undefined, { numeric: true });
+        });
+
+        uniqueClasses.forEach(kelas => {
+          const opt = document.createElement('option');
+          opt.value = kelas;
+          opt.textContent = kelas.toLowerCase().startsWith('kelas') ? kelas : `Kelas ${kelas}`;
+          selectClass.appendChild(opt);
+        });
+      }
+
+      // =========================================================================
+      // LANGKAH 2: POPULATE NAMA SISWA BERDASARKAN KELAS TERPILIH
+      // =========================================================================
+      selectClass.addEventListener('change', () => {
+        const selectedKelas = selectClass.value;
+        loginErrorAlert.classList.add('d-none');
+        
+        if (!selectedKelas) {
+          selectStudent.disabled = true;
+          selectStudent.innerHTML = '<option value="" selected disabled>-- Pilih kelas terlebih dahulu --</option>';
+          inputDob.disabled = true;
+          inputDob.value = '';
+          btnSubmitLogin.disabled = true;
+          stepBadgeStudent.parentElement.parentElement.classList.remove('step-active');
+          return;
+        }
+
+        // Filter siswa sesuai kelas
+        const filteredStudents = rawStudentData.filter(s => s.kelas === selectedKelas);
+
+        selectStudent.innerHTML = '<option value="" selected disabled>-- Pilih Nama Anda --</option>';
+        filteredStudents.forEach(siswa => {
+          const opt = document.createElement('option');
+          opt.value = siswa.id;
+          opt.textContent = `${siswa.nama}${siswa.nisn ? ` (NISN: ${siswa.nisn})` : ''}`;
+          selectStudent.appendChild(opt);
+        });
+
+        selectStudent.disabled = false;
+        studentHelperText.textContent = `Tersedia ${filteredStudents.length} siswa di Kelas ${selectedKelas}.`;
+        stepBadgeStudent.parentElement.parentElement.classList.add('step-active');
+
+        // Reset step 3
+        inputDob.disabled = true;
+        inputDob.value = '';
+        btnSubmitLogin.disabled = true;
+        stepBadgeDob.parentElement.parentElement.classList.remove('step-active');
+      });
+
+      // =========================================================================
+      // LANGKAH 3: AKTIFKAN INPUT TANGGAL LAHIR SETELAH SISWA DIPILIH
+      // =========================================================================
+      selectStudent.addEventListener('change', () => {
+        loginErrorAlert.classList.add('d-none');
+        if (selectStudent.value) {
+          inputDob.disabled = false;
+          btnSubmitLogin.disabled = false;
+          stepBadgeDob.parentElement.parentElement.classList.add('step-active');
+          inputDob.focus();
+        } else {
+          inputDob.disabled = true;
+          btnSubmitLogin.disabled = true;
+          stepBadgeDob.parentElement.parentElement.classList.remove('step-active');
+        }
+      });
+
+      // =========================================================================
+      // VALIDASI LOGIN SISWA (TANGGAL LAHIR SEBAGAI VERIFIKASI)
+      // =========================================================================
+      formStudentLogin.addEventListener('submit', (e) => {
+        e.preventDefault();
+        loginErrorAlert.classList.add('d-none');
+
+        const studentId = selectStudent.value;
+        const enteredDob = inputDob.value; // Format: YYYY-MM-DD
+
+        if (!studentId) {
+          showLoginError('Silakan pilih nama siswa terlebih dahulu.');
+          return;
+        }
+
+        if (!enteredDob) {
+          showLoginError('Silakan masukkan tanggal lahir Anda untuk autentikasi.');
+          return;
+        }
+
+        // Cari data siswa
+        const student = rawStudentData.find(s => String(s.id) === String(studentId));
+
+        if (!student) {
+          showLoginError('Data siswa tidak ditemukan di database.');
+          return;
+        }
+
+        // Normalisasi format tanggal lahir (YYYY-MM-DD)
+        const expectedDob = normalizeDob(student.tanggal_lahir);
+        const actualDob = normalizeDob(enteredDob);
+
+        if (expectedDob !== actualDob) {
+          showLoginError('Tanggal lahir tidak sesuai. Pastikan Anda memasukkan tanggal lahir yang benar.');
+          return;
+        }
+
+        // Autentikasi Sukses!
+        currentStudent = student;
+        sessionStorage.setItem('PORTAL_SISWA_SESSION', JSON.stringify({
+          studentId: student.id,
+          loggedAt: new Date().toISOString()
+        }));
+
+        renderDashboard(student);
+      });
+
+      function showLoginError(msg) {
+        loginErrorMessage.textContent = msg;
+        loginErrorAlert.classList.remove('d-none');
+        loginErrorAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      function normalizeDob(dobStr) {
+        if (!dobStr) return '';
+        const trimmed = String(dobStr).trim();
+        // Ubah format DD/MM/YYYY atau DD-MM-YYYY menjadi YYYY-MM-DD
+        if (trimmed.includes('/')) {
+          const parts = trimmed.split('/');
+          if (parts.length === 3 && parts[2].length === 4) {
+            return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+          }
+        }
+        if (/^\d{1,2}-\d{1,2}-\d{4}$/.test(trimmed)) {
+          const parts = trimmed.split('-');
+          return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        }
+        return trimmed;
+      }
+
+      // =========================================================================
+      // AMBIL HASIL UJIAN SISWA DARI PENYIMPANAN BROWSER LAPTOP PRIBADI (CBT)
+      // =========================================================================
+      function getStudentExamResults(student) {
+        if (!student) return [];
+        const exams = [];
+
+        // 1. Ambil dari riwayat rekap nilai CBT pada laptop / browser PC siswa ini (SMP_EXAM_REKAP_NILAI)
+        try {
+          const raw = localStorage.getItem('SMP_EXAM_REKAP_NILAI');
+          if (raw) {
+            const list = JSON.parse(raw);
+            if (Array.isArray(list)) {
+              const currentName = (student.nama || '').trim().toLowerCase();
+              list.forEach(item => {
+                if (!item) return;
+                const recName = (item.studentName || '').trim().toLowerCase();
+                
+                // Pencocokan nama siswa pada perangkat ini
+                const isMatch = recName === currentName || 
+                  (recName.length > 3 && currentName.includes(recName)) ||
+                  (currentName.length > 3 && recName.includes(currentName));
+
+                if (isMatch) {
+                  const score = Number(item.score) || 0;
+                  const kkm = item.kkm || 75;
+                  let status = item.isPassed ? 'Lulus' : 'Remedial';
+                  if (score >= 90) status = 'Sangat Baik';
+
+                  // Format tanggal ISO
+                  let examDate = new Date().toISOString().split('T')[0];
+                  if (item.completedAt) {
+                    try {
+                      const d = new Date(item.completedAt);
+                      if (!isNaN(d.getTime())) {
+                        examDate = d.toISOString().split('T')[0];
+                      }
+                    } catch (e) {}
+                  }
+
+                  exams.push({
+                    id: item.id || 'CBT_' + Date.now(),
+                    mapel: item.subject || 'Mata Pelajaran',
+                    semester: item.examType || 'Semester Ganjil',
+                    tanggal: examDate,
+                    nilai: score,
+                    kkm: kkm,
+                    status: status,
+                    detail: `Hasil Ujian CBT Laptop. Benar: ${item.correctAnswers || 0}/${item.totalQuestions || 0}, Salah: ${item.wrongAnswers || 0}. Pelanggaran: ${item.violations || 0}. Status: ${item.status || 'Selesai'}. Selesai pada: ${item.completedAt || '-'}`
+                  });
+                }
+              });
+            }
+          }
+        } catch (e) {
+          console.warn('Gagal membaca data ujian lokal:', e);
+        }
+
+        // 2. Gabungkan jika ada data hasil ujian yang diinput manual secara spesifik di data siswa
+        if (Array.isArray(student.hasil_ujian) && student.hasil_ujian.length > 0) {
+          student.hasil_ujian.forEach(ex => {
+            if (!exams.some(e => e.id === ex.id && e.mapel === ex.mapel)) {
+              exams.push(ex);
+            }
+          });
+        }
+
+        return exams;
+      }
+
+      // =========================================================================
+      // RENDER DASHBOARD PORTAL SISWA
+      // =========================================================================
+      function renderDashboard(student) {
+        loginSection.classList.add('d-none');
+        dashboardSection.classList.remove('d-none');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Greeting berdasarkan jam
+        const hour = new Date().getHours();
+        let greeting = 'Selamat Datang';
+        if (hour >= 4 && hour < 11) greeting = 'Selamat Pagi';
+        else if (hour >= 11 && hour < 15) greeting = 'Selamat Siang';
+        else if (hour >= 15 && hour < 18) greeting = 'Selamat Sore';
+        else greeting = 'Selamat Malam';
+
+        dashGreeting.textContent = greeting;
+        dashStudentName.textContent = student.nama;
+        dashClassBadge.textContent = `Kelas ${student.kelas}`;
+        dashNisnBadge.textContent = student.nisn ? `NISN: ${student.nisn}` : `ID: #${student.id}`;
+
+        // Inisial Avatar
+        const names = student.nama.split(' ');
+        const initials = (names[0][0] + (names.length > 1 ? names[names.length - 1][0] : '')).toUpperCase();
+        userAvatar.textContent = initials;
+
+        // Render Statistik
+        calculateAndRenderStats(student);
+
+        // Populate Filter Semester
+        populateSemesterFilter(student);
+
+        // Render Tabel
+        renderExamResults(student);
+      }
+
+      // =========================================================================
+      // PERHITUNGAN STATISTIK AKADEMIK
+      // =========================================================================
+      function calculateAndRenderStats(student) {
+        const exams = getStudentExamResults(student);
+        const total = exams.length;
+        statTotalExams.textContent = total;
+
+        if (total === 0) {
+          statAverage.textContent = '0';
+          statGradePredicate.textContent = 'Belum Ada Ujian';
+          statGradePredicate.className = 'badge border bg-secondary-subtle text-secondary';
+          statPassed.textContent = '0';
+          statRemedialCount.textContent = '/ 0 Remedial';
+          statPassRate.textContent = 'Belum ada evaluasi';
+          statHighest.textContent = '-';
+          statLowest.textContent = '-';
+          statHighestSubject.textContent = 'Belum ada data';
+          return;
+        }
+
+        const scores = exams.map(e => Number(e.nilai) || 0);
+        const sum = scores.reduce((acc, curr) => acc + curr, 0);
+        const avg = (sum / total).toFixed(1);
+        statAverage.textContent = avg;
+
+        // Predikat Rata-Rata
+        let pred = 'Cukup';
+        let predClass = 'bg-warning-subtle text-warning border-warning-subtle';
+        if (avg >= 90) {
+          pred = 'A (Sangat Memuaskan)';
+          predClass = 'bg-success-subtle text-success border-success-subtle';
+        } else if (avg >= 80) {
+          pred = 'B (Sangat Baik)';
+          predClass = 'bg-primary-subtle text-primary border-primary-subtle';
+        } else if (avg >= 75) {
+          pred = 'C (Baik/Tuntas)';
+          predClass = 'bg-info-subtle text-info border-info-subtle';
+        } else {
+          pred = 'D (Perlu Peningkatan)';
+          predClass = 'bg-danger-subtle text-danger border-danger-subtle';
+        }
+        statGradePredicate.className = `badge border ${predClass}`;
+        statGradePredicate.textContent = pred;
+
+        // Hitung Lulus vs Remedial
+        let passed = 0;
+        let remedial = 0;
+        exams.forEach(e => {
+          const kkm = e.kkm || 75;
+          const status = (e.status || '').toLowerCase();
+          if (status === 'remedial' || e.nilai < kkm) {
+            remedial++;
+          } else {
+            passed++;
+          }
+        });
+
+        statPassed.textContent = passed;
+        statRemedialCount.textContent = `/ ${remedial} Remedial`;
+        const passPercent = Math.round((passed / total) * 100);
+        statPassRate.innerHTML = `<i class="fas fa-percent text-success me-1"></i> Ketuntasan ${passPercent}%`;
+
+        // Tertinggi & Terendah
+        const maxScore = Math.max(...scores);
+        const minScore = Math.min(...scores);
+        statHighest.textContent = maxScore;
+        statLowest.textContent = minScore;
+
+        const bestExam = exams.find(e => Number(e.nilai) === maxScore);
+        if (bestExam) {
+          statHighestSubject.textContent = `Tertinggi: ${bestExam.mapel}`;
+        }
+      }
+
+      // =========================================================================
+      // FILTER SEMESTER
+      // =========================================================================
+      function populateSemesterFilter(student) {
+        const exams = getStudentExamResults(student);
+        const semesters = Array.from(new Set(exams.map(e => e.semester).filter(Boolean))).sort();
+
+        filterSemester.innerHTML = '<option value="ALL">Semua Semester</option>';
+        semesters.forEach(sem => {
+          const opt = document.createElement('option');
+          opt.value = sem;
+          opt.textContent = sem;
+          filterSemester.appendChild(opt);
+        });
+      }
+
+      // =========================================================================
+      // RENDER DAFTAR TABEL HASIL UJIAN
+      // =========================================================================
+      function renderExamResults(student) {
+        if (!student) return;
+        const exams = getStudentExamResults(student);
+        const query = (searchSubject.value || '').toLowerCase().trim();
+        const selectedSemester = filterSemester.value;
+        const selectedStatus = filterStatus.value;
+
+        // Filter data
+        const filtered = exams.filter(e => {
+          // Query mapel atau status
+          const matchQuery = !query || 
+            (e.mapel && e.mapel.toLowerCase().includes(query)) ||
+            (e.detail && e.detail.toLowerCase().includes(query));
+
+          // Filter Semester
+          const matchSemester = selectedSemester === 'ALL' || e.semester === selectedSemester;
+
+          // Filter Status
+          let matchStatus = true;
+          if (selectedStatus !== 'ALL') {
+            matchStatus = (e.status || '').toLowerCase() === selectedStatus.toLowerCase();
+          }
+
+          return matchQuery && matchSemester && matchStatus;
+        });
+
+        examResultTableBody.innerHTML = '';
+
+        if (filtered.length === 0) {
+          const heading = document.getElementById('emptyResultHeading');
+          const subtext = document.getElementById('emptyResultSubtext');
+          if (exams.length === 0) {
+            if (heading) heading.textContent = 'Belum Ada Hasil Ujian Pada Laptop Ini';
+            if (subtext) subtext.textContent = 'Data hasil ujian akan otomatis tampil di sini segera setelah Anda menyelesaikan sesi ujian online CBT di laptop ini.';
+          } else {
+            if (heading) heading.textContent = 'Tidak Ada Data Nilai Sesuai Filter';
+            if (subtext) subtext.textContent = 'Coba ubah kata kunci pencarian mata pelajaran atau pilihan semester/status di atas.';
+          }
+          emptyResultState.classList.remove('d-none');
+          return;
+        }
+
+        emptyResultState.classList.add('d-none');
+
+        filtered.forEach((item, idx) => {
+          const tr = document.createElement('tr');
+          const kkm = item.kkm || 75;
+          const score = Number(item.nilai) || 0;
+
+          // Badge status styling
+          let badgeClass = 'badge-status-lulus';
+          let statusText = item.status || (score >= kkm ? 'Lulus' : 'Remedial');
+
+          if (statusText.toLowerCase() === 'sangat baik' || score >= 90) {
+            badgeClass = 'badge-status-sangat-baik';
+          } else if (statusText.toLowerCase() === 'remedial' || score < kkm) {
+            badgeClass = 'badge-status-remedial';
+          }
+
+          // Format tanggal tampilan (e.g. 10 Maret 2026)
+          const formattedDate = formatDateIndo(item.tanggal);
+
+          tr.innerHTML = `
+            <td class="text-center fw-bold text-muted">${idx + 1}</td>
+            <td>
+              <div class="fw-bold text-dark">${escapeHtml(item.mapel)}</div>
+              <small class="text-muted">${item.detail ? escapeHtml(item.detail).substring(0, 48) + '...' : 'Hasil Asesmen Online'}</small>
+            </td>
+            <td><span class="badge bg-light text-secondary border">${escapeHtml(item.semester || 'Semester Reguler')}</span></td>
+            <td><small class="text-muted"><i class="far fa-calendar-alt me-1 text-primary"></i>${formattedDate}</small></td>
+            <td class="text-center">
+              <span class="badge bg-light text-dark border fs-6 fw-bold px-2.5 py-1.5">${score}</span>
+            </td>
+            <td class="text-center text-muted fw-bold">${kkm}</td>
+            <td class="text-center">
+              <span class="badge ${badgeClass} px-3 py-1.5 rounded-pill fw-bold">${escapeHtml(statusText)}</span>
+            </td>
+            <td class="text-center">
+              <button class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1 btn-detail-score" data-index="${idx}">
+                <i class="fas fa-eye me-1"></i> Rincian
+              </button>
+            </td>
+          `;
+
+          // Listener tombol rincian
+          tr.querySelector('.btn-detail-score').addEventListener('click', () => {
+            showScoreDetail(item);
+          });
+
+          examResultTableBody.appendChild(tr);
+        });
+      }
+
+      // Search & Filter Listeners
+      searchSubject.addEventListener('input', () => renderExamResults(currentStudent));
+      filterSemester.addEventListener('change', () => renderExamResults(currentStudent));
+      filterStatus.addEventListener('change', () => renderExamResults(currentStudent));
+
+      // =========================================================================
+      // MODAL DETAIL NILAI
+      // =========================================================================
+      function showScoreDetail(item) {
+        document.getElementById('modalMapelTitle').textContent = item.mapel;
+        document.getElementById('modalExamDate').textContent = `${item.semester || 'Semester 1'} &bull; Tanggal Ujian: ${formatDateIndo(item.tanggal)}`;
+        document.getElementById('modalFinalScore').textContent = item.nilai;
+        
+        const badge = document.getElementById('modalStatusBadge');
+        const kkm = item.kkm || 75;
+        const score = Number(item.nilai) || 0;
+        let status = item.status || (score >= kkm ? 'Lulus' : 'Remedial');
+
+        badge.textContent = status;
+        if (status.toLowerCase() === 'sangat baik' || score >= 90) {
+          badge.className = 'badge bg-success text-white px-3 py-2 rounded-pill fw-bold';
+        } else if (status.toLowerCase() === 'remedial' || score < kkm) {
+          badge.className = 'badge bg-danger text-white px-3 py-2 rounded-pill fw-bold';
+        } else {
+          badge.className = 'badge bg-primary text-white px-3 py-2 rounded-pill fw-bold';
+        }
+
+        document.getElementById('modalDetailBreakdown').textContent = item.detail || 
+          `Nilai Ujian: ${item.nilai} (KKM: ${kkm}). Siswa telah menyelesaikan seluruh butir soal ujian dengan baik.`;
+
+        const modal = new bootstrap.Modal(document.getElementById('scoreDetailModal'));
+        modal.show();
+      }
+
+      // =========================================================================
+      // FITUR SEGARKAN HASIL UJIAN DARI PENYIMPANAN BROWSER LAPTOP
+      // =========================================================================
+      const btnRefreshExams = document.getElementById('btnRefreshExams');
+      if (btnRefreshExams) {
+        btnRefreshExams.addEventListener('click', () => {
+          if (currentStudent) {
+            calculateAndRenderStats(currentStudent);
+            populateSemesterFilter(currentStudent);
+            renderExamResults(currentStudent);
+            const icon = btnRefreshExams.querySelector('i');
+            if (icon) {
+              icon.classList.add('fa-spin');
+              setTimeout(() => icon.classList.remove('fa-spin'), 600);
+            }
+          }
+        });
+      }
+
+      // Otomatis segarkan data saat jendela browser kembali aktif
+      window.addEventListener('focus', () => {
+        if (currentStudent) {
+          calculateAndRenderStats(currentStudent);
+          populateSemesterFilter(currentStudent);
+          renderExamResults(currentStudent);
+        }
+      });
+
+      // =========================================================================
+      // FITUR CETAK / SIMPAN PDF (OFFICIAL REPORT SHEET)
+      // =========================================================================
+      btnPrintReport.addEventListener('click', () => {
+        if (!currentStudent) return;
+        preparePrintSheet(currentStudent);
+        window.print();
+      });
+
+      function preparePrintSheet(student) {
+        document.getElementById('printStudentName').textContent = student.nama;
+        document.getElementById('printStudentClass').textContent = `Kelas ${student.kelas}`;
+        document.getElementById('printStudentNisn').textContent = student.nisn || '-';
+        
+        const now = new Date();
+        const dateOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+        const formattedNow = now.toLocaleDateString('id-ID', dateOptions);
+        document.getElementById('printDateNow').textContent = formattedNow;
+        document.getElementById('printSignDate').textContent = formattedNow;
+
+        const exams = getStudentExamResults(student);
+        const tbody = document.getElementById('printTableBody');
+        tbody.innerHTML = '';
+
+        let total = 0;
+        let count = exams.length;
+
+        exams.forEach((ex, idx) => {
+          const score = Number(ex.nilai) || 0;
+          total += score;
+          const kkm = ex.kkm || 75;
+          const status = ex.status || (score >= kkm ? 'Lulus' : 'Remedial');
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td style="text-align: center;">${idx + 1}</td>
+            <td style="font-weight: bold;">${escapeHtml(ex.mapel)}</td>
+            <td>${escapeHtml(ex.semester || 'Semester Ganjil')}</td>
+            <td style="text-align: center;">${formatDateIndo(ex.tanggal)}</td>
+            <td style="text-align: center;">${kkm}</td>
+            <td style="text-align: center; font-weight: bold;">${score}</td>
+            <td style="text-align: center;">${escapeHtml(status)}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        const avg = count > 0 ? (total / count).toFixed(1) : '0';
+        document.getElementById('printAverageScore').textContent = avg;
+        document.getElementById('printOverallStatus').textContent = avg >= 75 ? 'TUNTAS / LULUS' : 'PERLU REMEDIAL';
+      }
+
+      // =========================================================================
+      // LOGOUT
+      // =========================================================================
+      btnLogout.addEventListener('click', () => {
+        if (confirm('Apakah Anda yakin ingin keluar dari Portal Siswa?')) {
+          sessionStorage.removeItem('PORTAL_SISWA_SESSION');
+          currentStudent = null;
+          dashboardSection.classList.add('d-none');
+          loginSection.classList.remove('d-none');
+          formStudentLogin.reset();
+          selectStudent.disabled = true;
+          inputDob.disabled = true;
+          btnSubmitLogin.disabled = true;
+          populateClassDropdown();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+
+      // =========================================================================
+      // DEMO ACCOUNTS TABLE POPULATOR
+      // =========================================================================
+      function populateDemoAccountsTable() {
+        demoAccountTableBody.innerHTML = '';
+        if (!rawStudentData || rawStudentData.length === 0) {
+          demoAccountTableBody.innerHTML = `
+            <tr>
+              <td colspan="5" class="text-center py-4 text-muted">
+                <i class="fas fa-folder-open fa-2x mb-2 d-block text-secondary"></i>
+                <div class="fw-semibold text-dark">Belum ada data siswa yang dimuat.</div>
+                <div class="small mt-1">Data siswa resmi terhubung langsung dengan sistem sekolah.</div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+        rawStudentData.forEach(s => {
+          const sExams = getStudentExamResults(s);
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><span class="badge bg-secondary-subtle text-dark border">Kelas ${escapeHtml(s.kelas)}</span></td>
+            <td class="fw-bold">${escapeHtml(s.nama)}</td>
+            <td><code>${escapeHtml(s.tanggal_lahir)}</code></td>
+            <td class="text-center"><span class="badge ${sExams.length > 0 ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-light text-muted border'}">${sExams.length} Mapel</span></td>
+            <td class="text-center">
+              <button class="btn btn-primary btn-sm py-0 px-2 fw-semibold btn-autofill" style="font-size: 0.8rem;">
+                Gunakan Ini
+              </button>
+            </td>
+          `;
+          tr.querySelector('.btn-autofill').addEventListener('click', () => {
+            // Autofill ke formulir
+            selectClass.value = s.kelas;
+            selectClass.dispatchEvent(new Event('change'));
+            selectStudent.value = s.id;
+            selectStudent.dispatchEvent(new Event('change'));
+            inputDob.value = s.tanggal_lahir;
+
+            // Tutup modal
+            const demoModal = bootstrap.Modal.getInstance(document.getElementById('demoAccountModal'));
+            if (demoModal) demoModal.hide();
+
+            loginErrorAlert.classList.add('d-none');
+          });
+          demoAccountTableBody.appendChild(tr);
+        });
+      }
+
+      // =========================================================================
+      // HELPER FUNCTIONS
+      // =========================================================================
+      function formatDateIndo(dateStr) {
+        if (!dateStr) return '-';
+        try {
+          const parts = dateStr.split('-');
+          if (parts.length === 3) {
+            const months = [
+              'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+              'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
+            const day = parseInt(parts[2], 10);
+            const month = months[parseInt(parts[1], 10) - 1];
+            const year = parts[0];
+            return `${day} ${month} ${year}`;
+          }
+        } catch (e) {}
+        return dateStr;
+      }
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      // Check Session on Page Load
+      function checkExistingSession() {
+        populateClassDropdown();
+        populateDemoAccountsTable();
+
+        const savedSession = sessionStorage.getItem('PORTAL_SISWA_SESSION');
+        if (savedSession) {
+          try {
+            const parsed = JSON.parse(savedSession);
+            const found = rawStudentData.find(s => String(s.id) === String(parsed.studentId));
+            if (found) {
+              currentStudent = found;
+              renderDashboard(found);
+              return;
+            }
+          } catch (e) {
+            sessionStorage.removeItem('PORTAL_SISWA_SESSION');
+          }
+        }
+      }
+
+      checkExistingSession();
+    });
+  </script>
+</body>
+</html>
