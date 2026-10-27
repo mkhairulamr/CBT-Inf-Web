@@ -1,0 +1,400 @@
+# Soal UTS (Pertemuan 1-4) - 20 Soal Pilihan Ganda
+
+Pilih satu jawaban yang paling benar!
+
+**1.** CSS adalah singkatan dari ...
+A. Computer Style Sheets
+B. Cascading Style Sheets
+C. Creative Style System
+D. Colorful Style Sheets
+
+**2.** Fungsi CSS pada sebuah website adalah ...
+A. Membuat struktur halaman
+B. Menyimpan data pengunjung
+C. Membuat database
+D. Memberi gaya tampilan
+
+**3.** Jika HTML diibaratkan kerangka rumah, maka CSS diibaratkan ...
+A. Pondasi
+B. Atap
+C. Cat dan dekorasi
+D. Pintu
+
+**4.** Tiga bagian dalam aturan CSS adalah ...
+A. Selector, property, dan value
+B. Judul, paragraf, dan gambar
+C. Head, body, dan footer
+D. Tag, atribut, dan isi
+
+**5.** Penulisan aturan CSS yang benar adalah ...
+A. h1 (color=blue)
+B. h1 [color: blue]
+C. `<h1 color:blue>`
+D. h1 { color: blue; }
+
+**6.** Setiap property CSS diakhiri dengan tanda ...
+A. Titik (.)
+B. Koma (,)
+C. Titik koma (;)
+D. Titik dua (:)
+
+**7.** CSS yang ditulis langsung pada atribut `style` di tag HTML disebut ...
+A. Inline CSS
+B. Internal CSS
+C. External CSS
+D. Dynamic CSS
+
+**8.** Internal CSS ditulis di dalam tag ... pada bagian `<head>`.
+A. `<css>`
+B. `<style>`
+C. `<link>`
+D. `<script>`
+
+**9.** Cara menambahkan CSS yang paling disarankan adalah ...
+A. Inline CSS
+B. Internal CSS
+C. Semua cara sama saja
+D. External CSS
+
+**10.** Tag yang dipakai untuk menghubungkan file CSS ke HTML adalah ...
+A. `<link>`
+B. `<style>`
+C. `<css>`
+D. `<a>`
+
+**11.** Komentar di dalam CSS ditulis dengan ...
+A. `<!-- komentar -->`
+B. `// komentar`
+C. `/* komentar */`
+D. `# komentar`
+
+**12.** Selector yang memilih elemen berdasarkan id diawali dengan tanda ...
+A. Titik (.)
+B. Pagar (#)
+C. Bintang (*)
+D. Koma (,)
+
+**13.** Selector yang memilih elemen berdasarkan class diawali dengan tanda ...
+A. Titik (.)
+B. Pagar (#)
+C. Bintang (*)
+D. Koma (,)
+
+**14.** Property untuk mengubah warna teks adalah ...
+A. text-color
+B. font-color
+C. background
+D. color
+
+**15.** Property untuk mengubah warna latar belakang adalah ...
+A. bg-color
+B. color-back
+C. background-color
+D. back-color
+
+**16.** Agar teks berada di tengah, kita menulis ...
+A. text-style: center;
+B. text-align: center;
+C. align-text: middle;
+D. font-align: center;
+
+**17.** Kode `text-decoration: underline;` berfungsi untuk ...
+A. Membuat teks tebal
+B. Membuat teks miring
+C. Membuat teks besar
+D. Memberi garis bawah pada teks
+
+**18.** Agar sebuah kotak berbentuk lingkaran (lebar dan tinggi sama), nilai border-radius yang dipakai adalah ...
+A. 0
+B. 5px
+C. 50%
+D. 100px
+
+**19.** Pada kode `border: 2px solid red;`, kata "solid" berarti ...
+A. Garis biasa yang menyambung
+B. Garis putus-putus
+C. Garis titik-titik
+D. Garis ganda
+
+**20.** Property untuk membuat garis tepi hanya di bagian bawah elemen adalah ...
+A. border-under
+B. bottom-line
+C. border-low
+D. border-bottom
+
+---
+
+# Soal Final (Pertemuan 1-8) - 40 Soal Pilihan Ganda
+
+Pilih satu jawaban yang paling benar!
+
+**1.** CSS adalah singkatan dari ...
+A. Computer Style Sheets
+B. Creative Style System
+C. Cascading Style Sheets
+D. Colorful Style Sheets
+
+**2.** Pada aturan `h1 { color: blue; }`, kata `h1` disebut ...
+A. Selector
+B. Value
+C. Property
+D. Komentar
+
+**3.** Pada aturan `h1 { color: blue; }`, kata `blue` disebut ...
+A. Selector
+B. Value
+C. Property
+D. Tag
+
+**4.** File CSS eksternal memiliki ekstensi ...
+A. .html
+B. .style
+C. .web
+D. .css
+
+**5.** Komentar di CSS ditulis dengan ...
+A. `/* komentar */`
+B. `<!-- komentar -->`
+C. `// komentar`
+D. `# komentar`
+
+**6.** Selector class diawali dengan tanda ...
+A. Pagar (#)
+B. Koma (,)
+C. Titik (.)
+D. Bintang (*)
+
+**7.** ID pada sebuah elemen sebaiknya ...
+A. Dipakai berkali-kali
+B. Unik, hanya dipakai satu kali per halaman
+C. Sama dengan nama class
+D. Tidak perlu diberi nama
+
+**8.** Sebuah class boleh dipakai ...
+A. Hanya satu kali
+B. Hanya pada tag `<p>`
+C. Hanya pada tag `<h1>`
+D. Berkali-kali pada banyak elemen
+
+**9.** Aturan `h1, h2, h3 { color: blue; }` artinya ...
+A. h1, h2, dan h3 semuanya berwarna biru
+B. Hanya h1 yang berwarna biru
+C. Hanya h3 yang berwarna biru
+D. Tidak ada yang berwarna biru
+
+**10.** Kode warna HEX diawali dengan tanda ...
+A. @
+B. $
+C. #
+D. %
+
+**11.** Warna `rgb(255, 0, 0)` adalah warna ...
+A. Hijau
+B. Merah
+C. Biru
+D. Kuning
+
+**12.** Kode `text-transform: uppercase;` membuat teks menjadi ...
+A. Huruf kecil semua
+B. Huruf pertama besar
+C. Miring
+D. Huruf besar semua
+
+**13.** Property `font-family` berfungsi untuk mengubah ...
+A. Jenis huruf
+B. Ukuran huruf
+C. Warna huruf
+D. Ketebalan huruf
+
+**14.** Kode `font-weight: bold;` membuat teks menjadi ...
+A. Miring
+B. Kecil
+C. Tebal
+D. Bergaris bawah
+
+**15.** Agar sebuah kotak menjadi lingkaran sempurna, kita memakai ...
+A. Lebar dan tinggi berbeda, border-radius 0
+B. Lebar dan tinggi sama, border-radius 50%
+C. Border-radius 5px saja
+D. Margin 50%
+
+**16.** Property `background-image: url("bg.jpg");` berfungsi untuk ...
+A. Mengubah warna teks
+B. Memberi garis tepi
+C. Mengubah jenis huruf
+D. Memasang gambar sebagai latar belakang
+
+**17.** Pada kode `border: 3px dashed red;`, kata "dashed" berarti ...
+A. Garis putus-putus
+B. Garis lurus menyambung
+C. Garis ganda
+D. Tanpa garis
+
+**18.** Urutan Box Model dari luar ke dalam adalah ...
+A. Content, padding, border, margin
+B. Padding, margin, border, content
+C. Margin, border, padding, content
+D. Border, content, margin, padding
+
+**19.** Padding adalah ...
+A. Jarak antar elemen
+B. Jarak di dalam elemen, antara isi dan border
+C. Garis tepi elemen
+D. Warna latar elemen
+
+**20.** Margin adalah ...
+A. Jarak antara isi dan border
+B. Garis tepi elemen
+C. Isi dari elemen
+D. Jarak di luar elemen, antara elemen satu dengan lainnya
+
+**21.** Agar sebuah div (yang sudah punya width) berada di tengah halaman secara horizontal, kita memakai ...
+A. margin: auto;
+B. padding: center;
+C. text-align: auto;
+D. border: center;
+
+**22.** Kode `padding: 10px 20px;` berarti ...
+A. Semua sisi 10px
+B. Semua sisi 20px
+C. Atas-bawah 10px, kiri-kanan 20px
+D. Atas 20px, bawah 10px saja
+
+**23.** Fitur di browser yang dipakai untuk melihat Box Model sebuah elemen adalah ...
+A. Download
+B. Inspect
+C. Print
+D. Bookmark
+
+**24.** Property `width: 300px;` berfungsi untuk mengatur ...
+A. Tinggi elemen
+B. Warna elemen
+C. Jarak elemen
+D. Lebar elemen
+
+**25.** Kode `border-collapse: collapse;` pada tabel berfungsi untuk ...
+A. Menyatukan garis tepi tabel agar tidak ganda
+B. Menghapus isi tabel
+C. Mengubah warna tabel
+D. Menyembunyikan tabel
+
+**26.** Kode `list-style-type: none;` pada list akan ...
+A. Mengubah bullet jadi angka
+B. Mengubah bullet jadi kotak
+C. Menghilangkan bullet
+D. Menghapus list
+
+**27.** Selector `a:hover` dipakai untuk mengatur tampilan link ...
+A. Yang sudah dikunjungi
+B. Saat kursor mouse berada di atasnya
+C. Saat halaman pertama dibuka
+D. Yang rusak
+
+**28.** Kode `text-decoration: none;` pada tag `<a>` berfungsi untuk ...
+A. Membuat link tebal
+B. Membuat link miring
+C. Mengganti warna link
+D. Menghilangkan garis bawah link
+
+**29.** Selector `tr:nth-child(even)` dipakai untuk memilih ...
+A. Baris tabel genap
+B. Baris tabel pertama saja
+C. Semua kolom
+D. Baris tabel ganjil
+
+**30.** Agar sebuah link tampak seperti tombol, kita dapat menambahkan ...
+A. Hanya warna teks
+B. Hanya garis bawah
+C. Padding, background, dan border-radius
+D. Hanya ukuran huruf
+
+**31.** Elemen berikut yang termasuk elemen block adalah ...
+A. `<span>`
+B. `<div>`
+C. `<a>`
+D. `<img>`
+
+**32.** Elemen berikut yang termasuk elemen inline adalah ...
+A. `<div>`
+B. `<p>`
+C. `<h1>`
+D. `<span>`
+
+**33.** Nilai `display: inline-block;` membuat elemen ...
+A. Berjajar di baris yang sama, tetapi width dan height tetap bisa diatur
+B. Hilang dari halaman
+C. Selalu di baris baru
+D. Tidak bisa diberi warna
+
+**34.** Nilai `display: none;` berfungsi untuk ...
+A. Membuat elemen lebih besar
+B. Membuat elemen berwarna putih
+C. Menyembunyikan elemen sepenuhnya
+D. Membuat elemen berjajar
+
+**35.** Agar menu navigasi (ul + li) tampil horizontal, `li` diberi ...
+A. display: none;
+B. display: inline-block;
+C. display: hidden;
+D. display: vertical;
+
+**36.** Tag semantic yang dipakai untuk bagian kepala (atas) halaman adalah ...
+A. `<foot>`
+B. `<top>`
+C. `<head>`
+D. `<header>`
+
+**37.** Tag semantic yang dipakai untuk bagian paling bawah halaman adalah ...
+A. `<footer>`
+B. `<nav>`
+C. `<main>`
+D. `<header>`
+
+**38.** Pada proyek akhir, jumlah file CSS yang dipakai untuk semua halaman website adalah ...
+A. Satu file untuk setiap halaman
+B. Dua file
+C. Satu file (style.css) untuk semua halaman
+D. Tidak perlu file CSS
+
+**39.** Pada proyek akhir, cara menulis CSS yang TIDAK boleh dipakai adalah ...
+A. External CSS
+B. Inline CSS (atribut style)
+C. Komentar CSS
+D. Selector class
+
+**40.** Tag `<link>` ke file style.css dipasang di bagian ...
+A. `<footer>`
+B. `<body>`
+C. `<title>`
+D. `<head>`
+
+---
+
+# Kunci Jawaban
+
+**UTS (20 soal)**
+
+| No | Jwb | No | Jwb | No | Jwb | No | Jwb |
+|---|---|---|---|---|---|---|---|
+| 1 | B | 6 | C | 11 | C | 16 | B |
+| 2 | D | 7 | A | 12 | B | 17 | D |
+| 3 | C | 8 | B | 13 | A | 18 | C |
+| 4 | A | 9 | D | 14 | D | 19 | A |
+| 5 | D | 10 | A | 15 | C | 20 | D |
+
+**Final (40 soal)**
+
+| No | Jwb | No | Jwb | No | Jwb | No | Jwb |
+|---|---|---|---|---|---|---|---|
+| 1 | C | 11 | B | 21 | A | 31 | B |
+| 2 | A | 12 | D | 22 | C | 32 | D |
+| 3 | B | 13 | A | 23 | B | 33 | A |
+| 4 | D | 14 | C | 24 | D | 34 | C |
+| 5 | A | 15 | B | 25 | A | 35 | B |
+| 6 | C | 16 | D | 26 | C | 36 | D |
+| 7 | B | 17 | A | 27 | B | 37 | A |
+| 8 | D | 18 | C | 28 | D | 38 | C |
+| 9 | A | 19 | B | 29 | A | 39 | B |
+| 10 | C | 20 | D | 30 | C | 40 | D |
+
+Sebaran soal Final: Pertemuan 1-4 sebanyak 17 soal, Pertemuan 5 sebanyak 7 soal, Pertemuan 6 sebanyak 5 soal, Pertemuan 7 sebanyak 7 soal, dan Pertemuan 8 sebanyak 3 soal. Mau saya jadikan file Word (.docx) siap cetak, dengan lembar soal dan kunci jawaban terpisah?

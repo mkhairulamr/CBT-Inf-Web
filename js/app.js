@@ -52,6 +52,16 @@
 
       // Pastikan soal resmi untuk Kelas 7, 8, 9 terpasang tanpa duplikasi
       if (typeof OFFICIAL_BANK_SOAL !== 'undefined' && Array.isArray(OFFICIAL_BANK_SOAL)) {
+        // Sinkronisasi otomatis soal resmi Kelas 8 Web Programming (CSS & Box Model)
+        const web8Updated = localStorage.getItem('SMP_EXAM_WEB8_CSS_V2');
+        if (web8Updated !== 'true') {
+          // Hilangkan dummy data soal kelas 8 Web Programming terdahulu
+          bank = bank.filter(q => !(String(q.grade) === '8' && q.subject === 'Web Programming'));
+          const web8NewQuestions = OFFICIAL_BANK_SOAL.filter(q => String(q.grade) === '8' && q.subject === 'Web Programming');
+          bank.push(...web8NewQuestions);
+          localStorage.setItem('SMP_EXAM_WEB8_CSS_V2', 'true');
+        }
+
         const hasWeb9 = bank.some(q => String(q.grade) === '9' && q.subject === 'Web Programming');
         const hasWeb7 = bank.some(q => String(q.grade) === '7' && q.subject === 'Web Programming');
         const hasInf7 = bank.some(q => String(q.grade) === '7' && q.subject === 'Informatika');

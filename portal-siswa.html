@@ -1478,16 +1478,27 @@
       // =========================================================================
       // FITUR CETAK / SIMPAN PDF (OFFICIAL REPORT SHEET)
       // =========================================================================
-      btnPrintReport.addEventListener('click', () => {
-        if (!currentStudent) return;
-        preparePrintSheet(currentStudent);
-        window.print();
-      });
+      // FITUR CETAK / SIMPAN PDF (OFFICIAL REPORT SHEET & MODAL PREVIEW)
+      // =========================================================================
+      function showToast(message, type = 'success') {
+        const toastEl = document.getElementById('portalToast');
+        const msgEl = document.getElementById('portalToastMessage');
+        if (!toastEl || !msgEl) return;
+        
+        let icon = '<i class="fas fa-check-circle text-success fs-5"></i>';
+        if (type === 'danger') icon = '<i class="fas fa-circle-exclamation text-danger fs-5"></i>';
+        else if (type === 'info') icon = '<i class="fas fa-info-circle text-info fs-5"></i>';
+        
+        msgEl.innerHTML = `${icon} <span>${message}</span>`;
+        const toast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 3500 });
+        toast.show();
+      }
 
       function preparePrintSheet(student) {
-        document.getElementById('printStudentName').textContent = student.nama;
-        document.getElementById('printStudentClass').textContent = `Kelas ${student.kelas}`;
-        document.getElementById('printStudentNisn').textContent = student.nisn || '-';
+        if (!student) return;
+        document.getElementById('printStudentName').textContent = student.nama || '-';
+        document.getElementById('printStudentClass').textContent = student.kelas ? `Kelas ${student.kelas}` : '-';
+        document.getElementById('printStudentNisn').textContent = student.nisn || student.id || '-';
         
         const now = new Date();
         const dateOptions = { day: 'numeric', month: 'long', year: 'numeric' };
@@ -1501,6 +1512,19 @@
 
         let total = 0;
         let count = exams.length;
+
+        if (count === 0) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td colspan="7" style="text-align: center; padding: 25px 10px; color: #64748b; font-style: italic;">
+              Belum ada riwayat hasil ujian CBT yang diselesaikan pada laptop / komputer ini.
+            </td>
+          `;
+          tbody.appendChild(tr);
+          document.getElementById('printAverageScore').textContent = '0';
+          document.getElementById('printOverallStatus').textContent = 'BELUM ADA NILAI';
+          return;
+        }
 
         exams.forEach((ex, idx) => {
           const score = Number(ex.nilai) || 0;
@@ -1526,11 +1550,110 @@
         document.getElementById('printOverallStatus').textContent = avg >= 75 ? 'TUNTAS / LULUS' : 'PERLU REMEDIAL';
       }
 
+      // Buka Modal Cetak / Simpan PDF
+      btnPrintReport.addEventListener('click', () => {
+        if (!currentStudent) return;
+        preparePrintSheet(currentStudent);
+        
+        // Salin isi printable sheet ke container pratinjau modal
+        const sheet = document.getElementById('printableSheet');
+        const previewTarget = document.getElementById('pdfPrintableClone');
+        if (sheet && previewTarget) {
+          previewTarget.innerHTML = sheet.innerHTML;
+        }
+
+        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('printReportModal'));
+        modal.show();
+      });
+
+      // Fungsi Download PDF menggunakan html2pdf
+      async function handleDownloadPdf() {
+        if (!currentStudent) return;
+        const btn1 = document.getElementById('modalBtnDownloadPdf');
+        const btn2 = document.getElementById('modalBtnDownloadPdf2');
+        const originalText1 = btn1 ? btn1.innerHTML : '';
+        const originalText2 = btn2 ? btn2.innerHTML : '';
+
+        if (btn1) { btn1.disabled = true; btn1.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Menyiapkan PDF...'; }
+        if (btn2) { btn2.disabled = true; btn2.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Menyiapkan PDF...'; }
+
+        try {
+          preparePrintSheet(currentStudent);
+          const element = document.getElementById('printableSheet');
+          
+          // Tampilkan sementara agar html2pdf dapat membaca dimensi layout
+          const originalDisplay = element.style.display;
+          element.style.display = 'block';
+
+          const sanitizedName = (currentStudent.nama || 'Siswa').replace(/[^a-zA-Z0-9]/g, '_');
+          const sanitizedClass = (currentStudent.kelas || '').replace(/[^a-zA-Z0-9]/g, '_');
+          const filename = `Rapor_${sanitizedName}_${sanitizedClass}.pdf`;
+
+          const opt = {
+            margin: [8, 8, 8, 8],
+            filename: filename,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, logging: false },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+          };
+
+          if (window.html2pdf) {
+            await window.html2pdf().set(opt).from(element).save();
+            showToast(`Berkas PDF (${filename}) berhasil diunduh!`, 'success');
+          } else {
+            // Fallback cetak dokumen jika CDN lambat
+            try {
+              window.print();
+            } catch (err) {
+              showToast('Peramban tidak dapat membuka dialog cetak langsung.', 'info');
+            }
+          }
+
+          element.style.display = originalDisplay;
+        } catch (e) {
+          console.error('Gagal generate PDF:', e);
+          showToast('Gagal membuat berkas PDF. Membuka dialog cetak...', 'danger');
+          try { window.print(); } catch (err) {}
+        } finally {
+          if (btn1) { btn1.disabled = false; btn1.innerHTML = originalText1; }
+          if (btn2) { btn2.disabled = false; btn2.innerHTML = originalText2; }
+        }
+      }
+
+      function handleDirectPrint() {
+        preparePrintSheet(currentStudent);
+        try {
+          window.print();
+        } catch (err) {
+          console.warn('window.print error:', err);
+          showToast('Dialog cetak dibatasi peramban. Silakan gunakan tombol "Unduh Berkas PDF".', 'info');
+        }
+      }
+
+      const modalBtnDownloadPdf = document.getElementById('modalBtnDownloadPdf');
+      const modalBtnDownloadPdf2 = document.getElementById('modalBtnDownloadPdf2');
+      if (modalBtnDownloadPdf) modalBtnDownloadPdf.addEventListener('click', handleDownloadPdf);
+      if (modalBtnDownloadPdf2) modalBtnDownloadPdf2.addEventListener('click', handleDownloadPdf);
+
+      const modalBtnDirectPrint = document.getElementById('modalBtnDirectPrint');
+      const modalBtnDirectPrint2 = document.getElementById('modalBtnDirectPrint2');
+      if (modalBtnDirectPrint) modalBtnDirectPrint.addEventListener('click', handleDirectPrint);
+      if (modalBtnDirectPrint2) modalBtnDirectPrint2.addEventListener('click', handleDirectPrint);
+
       // =========================================================================
-      // LOGOUT
+      // FITUR KELUAR (LOGOUT) BERBASIS BOOTSTRAP MODAL
       // =========================================================================
       btnLogout.addEventListener('click', () => {
-        if (confirm('Apakah Anda yakin ingin keluar dari Portal Siswa?')) {
+        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('logoutConfirmModal'));
+        modal.show();
+      });
+
+      const btnConfirmLogoutAction = document.getElementById('btnConfirmLogoutAction');
+      if (btnConfirmLogoutAction) {
+        btnConfirmLogoutAction.addEventListener('click', () => {
+          const modal = bootstrap.Modal.getInstance(document.getElementById('logoutConfirmModal'));
+          if (modal) modal.hide();
+
           sessionStorage.removeItem('PORTAL_SISWA_SESSION');
           currentStudent = null;
           dashboardSection.classList.add('d-none');
@@ -1541,8 +1664,9 @@
           btnSubmitLogin.disabled = true;
           populateClassDropdown();
           window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-      });
+          showToast('Anda telah berhasil keluar dari Portal Siswa.', 'info');
+        });
+      }
 
       // =========================================================================
       // DEMO ACCOUNTS TABLE POPULATOR

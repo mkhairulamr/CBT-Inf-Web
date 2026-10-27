@@ -3942,36 +3942,919 @@ const RAW_WEB_FINAL = [
   }
 ];
 
-// Masukkan soal Web Programming untuk Kelas 7 dan Kelas 8 (Midterm 20 soal, Final 40 soal)
-['7', '8'].forEach(grade => {
-  RAW_WEB_MIDTERM.forEach(q => {
-    OFFICIAL_BANK_SOAL.push({
-      id: `web${grade}_mid_${q.num}`,
-      grade: grade,
-      subject: "Web Programming",
-      examType: "Midterm",
-      question: q.question,
-      code: q.code || "",
-      lang: q.lang || "",
-      options: q.options,
-      key: q.key,
-      explanation: q.explanation
-    });
-  });
+// =========================================================================
+// KELAS 8 - WEB PROGRAMMING (CSS & BOX MODEL)
+// UTS (Pertemuan 1-4) - 20 Soal Pilihan Ganda Resmi
+// =========================================================================
+const RAW_WEB8_MIDTERM = [
+  {
+    "num": 1,
+    "question": "CSS adalah singkatan dari ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Computer Style Sheets",
+      "B": "Cascading Style Sheets",
+      "C": "Creative Style System",
+      "D": "Colorful Style Sheets"
+    },
+    "key": "B",
+    "explanation": "CSS merupakan singkatan dari Cascading Style Sheets yang digunakan untuk mengatur tampilan dan gaya halaman web."
+  },
+  {
+    "num": 2,
+    "question": "Fungsi CSS pada sebuah website adalah ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Membuat struktur halaman",
+      "B": "Menyimpan data pengunjung",
+      "C": "Membuat database",
+      "D": "Memberi gaya tampilan"
+    },
+    "key": "D",
+    "explanation": "CSS berfungsi untuk memberikan gaya tampilan, warna, tata letak, dan keindahan visual pada website."
+  },
+  {
+    "num": 3,
+    "question": "Jika HTML diibaratkan kerangka rumah, maka CSS diibaratkan ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Pondasi",
+      "B": "Atap",
+      "C": "Cat dan dekorasi",
+      "D": "Pintu"
+    },
+    "key": "C",
+    "explanation": "Dalam analogi pembuatan rumah, HTML adalah kerangka/struktur bangunan, sedangkan CSS adalah cat, dekorasi, dan desain keindahan."
+  },
+  {
+    "num": 4,
+    "question": "Tiga bagian dalam aturan CSS adalah ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Selector, property, dan value",
+      "B": "Judul, paragraf, dan gambar",
+      "C": "Head, body, dan footer",
+      "D": "Tag, atribut, dan isi"
+    },
+    "key": "A",
+    "explanation": "Struktur aturan sintaks CSS terdiri dari selector (elemen target), property (atribut gaya), dan value (nilai gaya)."
+  },
+  {
+    "num": 5,
+    "question": "Penulisan aturan CSS yang benar adalah ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "h1 (color=blue)",
+      "B": "h1 [color: blue]",
+      "C": "<h1 color:blue>",
+      "D": "h1 { color: blue; }"
+    },
+    "key": "D",
+    "explanation": "Aturan CSS ditulis dengan selector diikuti tanda kurung kurawal { property: value; }."
+  },
+  {
+    "num": 6,
+    "question": "Setiap property CSS diakhiri dengan tanda ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Titik (.)",
+      "B": "Koma (,)",
+      "C": "Titik koma (;)",
+      "D": "Titik dua (:)"
+    },
+    "key": "C",
+    "explanation": "Setiap deklarasi pasangan property dan value pada CSS diakhiri dengan tanda titik koma (;)."
+  },
+  {
+    "num": 7,
+    "question": "CSS yang ditulis langsung pada atribut style di tag HTML disebut ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Inline CSS",
+      "B": "Internal CSS",
+      "C": "External CSS",
+      "D": "Dynamic CSS"
+    },
+    "key": "A",
+    "explanation": "Inline CSS adalah metode penulisan kode CSS langsung di dalam atribut style pada elemen tag HTML."
+  },
+  {
+    "num": 8,
+    "question": "Internal CSS ditulis di dalam tag ... pada bagian <head>.",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "<css>",
+      "B": "<style>",
+      "C": "<link>",
+      "D": "<script>"
+    },
+    "key": "B",
+    "explanation": "Internal CSS diletakkan di dalam tag <style> ... </style> pada bagian <head> dokumen HTML."
+  },
+  {
+    "num": 9,
+    "question": "Cara menambahkan CSS yang paling disarankan adalah ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Inline CSS",
+      "B": "Internal CSS",
+      "C": "Semua cara sama saja",
+      "D": "External CSS"
+    },
+    "key": "D",
+    "explanation": "External CSS paling disarankan karena memisahkan struktur dan desain sehingga file CSS dapat digunakan berulang di banyak halaman."
+  },
+  {
+    "num": 10,
+    "question": "Tag yang dipakai untuk menghubungkan file CSS ke HTML adalah ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "<link>",
+      "B": "<style>",
+      "C": "<css>",
+      "D": "<a>"
+    },
+    "key": "A",
+    "explanation": "Tag <link rel=\"stylesheet\" href=\"style.css\"> pada bagian <head> digunakan untuk memanggil file CSS eksternal."
+  },
+  {
+    "num": 11,
+    "question": "Komentar di dalam CSS ditulis dengan ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "<!-- komentar -->",
+      "B": "// komentar",
+      "C": "/* komentar */",
+      "D": "# komentar"
+    },
+    "key": "C",
+    "explanation": "Komentar pada CSS diawali dengan /* dan diakhiri dengan */."
+  },
+  {
+    "num": 12,
+    "question": "Selector yang memilih elemen berdasarkan id diawali dengan tanda ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Titik (.)",
+      "B": "Pagar (#)",
+      "C": "Bintang (*)",
+      "D": "Koma (,)"
+    },
+    "key": "B",
+    "explanation": "Selector ID pada CSS diawali dengan simbol pagar/tagar (#), misalnya #header."
+  },
+  {
+    "num": 13,
+    "question": "Selector yang memilih elemen berdasarkan class diawali dengan tanda ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Titik (.)",
+      "B": "Pagar (#)",
+      "C": "Bintang (*)",
+      "D": "Koma (,)"
+    },
+    "key": "A",
+    "explanation": "Selector class pada CSS diawali dengan simbol titik (.), misalnya .btn."
+  },
+  {
+    "num": 14,
+    "question": "Property untuk mengubah warna teks adalah ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "text-color",
+      "B": "font-color",
+      "C": "background",
+      "D": "color"
+    },
+    "key": "D",
+    "explanation": "Property 'color' digunakan untuk menentukan warna huruf/teks pada elemen."
+  },
+  {
+    "num": 15,
+    "question": "Property untuk mengubah warna latar belakang adalah ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "bg-color",
+      "B": "color-back",
+      "C": "background-color",
+      "D": "back-color"
+    },
+    "key": "C",
+    "explanation": "Property 'background-color' digunakan untuk mengatur warna latar belakang suatu elemen."
+  },
+  {
+    "num": 16,
+    "question": "Agar teks berada di tengah, kita menulis ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "text-style: center;",
+      "B": "text-align: center;",
+      "C": "align-text: middle;",
+      "D": "font-align: center;"
+    },
+    "key": "B",
+    "explanation": "Property text-align: center; digunakan untuk mengatur perataan teks secara horizontal agar berada di tengah."
+  },
+  {
+    "num": 17,
+    "question": "Kode text-decoration: underline; berfungsi untuk ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Membuat teks tebal",
+      "B": "Membuat teks miring",
+      "C": "Membuat teks besar",
+      "D": "Memberi garis bawah pada teks"
+    },
+    "key": "D",
+    "explanation": "Nilai underline pada property text-decoration memberikan garis bawah pada teks."
+  },
+  {
+    "num": 18,
+    "question": "Agar sebuah kotak berbentuk lingkaran (lebar dan tinggi sama), nilai border-radius yang dipakai adalah ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "0",
+      "B": "5px",
+      "C": "50%",
+      "D": "100px"
+    },
+    "key": "C",
+    "explanation": "Dengan lebar dan tinggi yang sama, nilai border-radius: 50% akan membuat elemen berbentuk lingkaran sempurna."
+  },
+  {
+    "num": 19,
+    "question": "Pada kode border: 2px solid red;, kata \"solid\" berarti ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Garis biasa yang menyambung",
+      "B": "Garis putus-putus",
+      "C": "Garis titik-titik",
+      "D": "Garis ganda"
+    },
+    "key": "A",
+    "explanation": "Nilai solid pada border style berarti garis tepi berupa garis lurus/biasa yang menyambung tanpa putus."
+  },
+  {
+    "num": 20,
+    "question": "Property untuk membuat garis tepi hanya di bagian bawah elemen adalah ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "border-under",
+      "B": "bottom-line",
+      "C": "border-low",
+      "D": "border-bottom"
+    },
+    "key": "D",
+    "explanation": "Property border-bottom digunakan untuk membuat garis tepi khusus di sisi bawah elemen."
+  }
+];
 
-  RAW_WEB_FINAL.forEach(q => {
-    OFFICIAL_BANK_SOAL.push({
-      id: `web${grade}_fin_${q.num}`,
-      grade: grade,
-      subject: "Web Programming",
-      examType: "Final",
-      question: q.question,
-      code: q.code || "",
-      lang: q.lang || "",
-      options: q.options,
-      key: q.key,
-      explanation: q.explanation
-    });
+// =========================================================================
+// KELAS 8 - WEB PROGRAMMING (CSS & BOX MODEL)
+// FINAL (Pertemuan 1-8) - 40 Soal Pilihan Ganda Resmi
+// =========================================================================
+const RAW_WEB8_FINAL = [
+  {
+    "num": 1,
+    "question": "CSS adalah singkatan dari ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Computer Style Sheets",
+      "B": "Creative Style System",
+      "C": "Cascading Style Sheets",
+      "D": "Colorful Style Sheets"
+    },
+    "key": "C",
+    "explanation": "CSS adalah singkatan dari Cascading Style Sheets."
+  },
+  {
+    "num": 2,
+    "question": "Pada aturan h1 { color: blue; }, kata h1 disebut ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Selector",
+      "B": "Value",
+      "C": "Property",
+      "D": "Komentar"
+    },
+    "key": "A",
+    "explanation": "Elemen h1 bertindak sebagai selector, yaitu penunjuk elemen mana yang akan diberi gaya."
+  },
+  {
+    "num": 3,
+    "question": "Pada aturan h1 { color: blue; }, kata blue disebut ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Selector",
+      "B": "Value",
+      "C": "Property",
+      "D": "Tag"
+    },
+    "key": "B",
+    "explanation": "Kata 'blue' adalah value (nilai) yang diberikan untuk property 'color'."
+  },
+  {
+    "num": 4,
+    "question": "File CSS eksternal memiliki ekstensi ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": ".html",
+      "B": ".style",
+      "C": ".web",
+      "D": ".css"
+    },
+    "key": "D",
+    "explanation": "File stylesheet eksternal disimpan dengan ekstensi berkas .css."
+  },
+  {
+    "num": 5,
+    "question": "Komentar di CSS ditulis dengan ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "/* komentar */",
+      "B": "<!-- komentar -->",
+      "C": "// komentar",
+      "D": "# komentar"
+    },
+    "key": "A",
+    "explanation": "Komentar pada kode CSS diapit oleh tanda /* dan */."
+  },
+  {
+    "num": 6,
+    "question": "Selector class diawali dengan tanda ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Pagar (#)",
+      "B": "Koma (,)",
+      "C": "Titik (.)",
+      "D": "Bintang (*)"
+    },
+    "key": "C",
+    "explanation": "Selector class selalu diawali dengan tanda titik (.), contohnya .kartu-produk."
+  },
+  {
+    "num": 7,
+    "question": "ID pada sebuah elemen sebaiknya ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Dipakai berkali-kali",
+      "B": "Unik, hanya dipakai satu kali per halaman",
+      "C": "Sama dengan nama class",
+      "D": "Tidak perlu diberi nama"
+    },
+    "key": "B",
+    "explanation": "Atribut ID bersifat unik dan hanya boleh digunakan satu kali untuk satu elemen tertentu pada setiap halaman."
+  },
+  {
+    "num": 8,
+    "question": "Sebuah class boleh dipakai ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Hanya satu kali",
+      "B": "Hanya pada tag <p>",
+      "C": "Hanya pada tag <h1>",
+      "D": "Berkali-kali pada banyak elemen"
+    },
+    "key": "D",
+    "explanation": "Class dirancang agar dapat digunakan berulang kali pada berbagai elemen berbeda di satu halaman web."
+  },
+  {
+    "num": 9,
+    "question": "Aturan h1, h2, h3 { color: blue; } artinya ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "h1, h2, dan h3 semuanya berwarna biru",
+      "B": "Hanya h1 yang berwarna biru",
+      "C": "Hanya h3 yang berwarna biru",
+      "D": "Tidak ada yang berwarna biru"
+    },
+    "key": "A",
+    "explanation": "Tanda koma antar selector berfungsi mengelompokkan (grouping) sehingga aturan berlaku untuk h1, h2, dan h3 sekaligus."
+  },
+  {
+    "num": 10,
+    "question": "Kode warna HEX diawali dengan tanda ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "@",
+      "B": "$",
+      "C": "#",
+      "D": "%"
+    },
+    "key": "C",
+    "explanation": "Format warna heksadesimal diawali dengan simbol pagar (#), seperti #ffffff atau #ff0000."
+  },
+  {
+    "num": 11,
+    "question": "Warna rgb(255, 0, 0) adalah warna ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Hijau",
+      "B": "Merah",
+      "C": "Biru",
+      "D": "Kuning"
+    },
+    "key": "B",
+    "explanation": "Pada format RGB (Red, Green, Blue), nilai (255, 0, 0) berarti nilai merah maksimal (Red) sedangkan hijau dan biru nol."
+  },
+  {
+    "num": 12,
+    "question": "Kode text-transform: uppercase; membuat teks menjadi ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Huruf kecil semua",
+      "B": "Huruf pertama besar",
+      "C": "Miring",
+      "D": "Huruf besar semua"
+    },
+    "key": "D",
+    "explanation": "Nilai uppercase mengubah semua karakter teks menjadi huruf kapital (huruf besar semua)."
+  },
+  {
+    "num": 13,
+    "question": "Property font-family berfungsi untuk mengubah ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Jenis huruf",
+      "B": "Ukuran huruf",
+      "C": "Warna huruf",
+      "D": "Ketebalan huruf"
+    },
+    "key": "A",
+    "explanation": "Property font-family digunakan untuk memilih jenis tipografi/huruf (seperti Arial, Roboto, Sans-Serif)."
+  },
+  {
+    "num": 14,
+    "question": "Kode font-weight: bold; membuat teks menjadi ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Miring",
+      "B": "Kecil",
+      "C": "Tebal",
+      "D": "Bergaris bawah"
+    },
+    "key": "C",
+    "explanation": "Nilai bold pada property font-weight membuat tulisan menjadi tebal."
+  },
+  {
+    "num": 15,
+    "question": "Agar sebuah kotak menjadi lingkaran sempurna, kita memakai ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Lebar dan tinggi berbeda, border-radius 0",
+      "B": "Lebar dan tinggi sama, border-radius 50%",
+      "C": "Border-radius 5px saja",
+      "D": "Margin 50%"
+    },
+    "key": "B",
+    "explanation": "Elemen dengan lebar dan tinggi seimbang (rasio 1:1) ditambah border-radius: 50% akan membentuk lingkaran bulat sempurna."
+  },
+  {
+    "num": 16,
+    "question": "Property background-image: url(\"bg.jpg\"); berfungsi untuk ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Mengubah warna teks",
+      "B": "Memberi garis tepi",
+      "C": "Mengubah jenis huruf",
+      "D": "Memasang gambar sebagai latar belakang"
+    },
+    "key": "D",
+    "explanation": "background-image: url() digunakan untuk memasang berkas citra/gambar sebagai latar belakang elemen."
+  },
+  {
+    "num": 17,
+    "question": "Pada kode border: 3px dashed red;, kata \"dashed\" berarti ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Garis putus-putus",
+      "B": "Garis lurus menyambung",
+      "C": "Garis ganda",
+      "D": "Tanpa garis"
+    },
+    "key": "A",
+    "explanation": "Nilai dashed menghasilkan garis tepi dengan pola putus-putus."
+  },
+  {
+    "num": 18,
+    "question": "Urutan Box Model dari luar ke dalam adalah ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Content, padding, border, margin",
+      "B": "Padding, margin, border, content",
+      "C": "Margin, border, padding, content",
+      "D": "Border, content, margin, padding"
+    },
+    "key": "C",
+    "explanation": "Lapisan Box Model CSS dari sisi terluar ke terdalam adalah Margin (terluar), Border, Padding, lalu Content (terdalam)."
+  },
+  {
+    "num": 19,
+    "question": "Padding adalah ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Jarak antar elemen",
+      "B": "Jarak di dalam elemen, antara isi dan border",
+      "C": "Garis tepi elemen",
+      "D": "Warna latar elemen"
+    },
+    "key": "B",
+    "explanation": "Padding adalah ruang jarak internal antara konten elemen dengan batas garis tepi (border)."
+  },
+  {
+    "num": 20,
+    "question": "Margin adalah ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Jarak antara isi dan border",
+      "B": "Garis tepi elemen",
+      "C": "Isi dari elemen",
+      "D": "Jarak di luar elemen, antara elemen satu dengan lainnya"
+    },
+    "key": "D",
+    "explanation": "Margin adalah ruang jarak eksternal yang memisahkan elemen dari elemen-elemen di sekelilingnya."
+  },
+  {
+    "num": 21,
+    "question": "Agar sebuah div (yang sudah punya width) berada di tengah halaman secara horizontal, kita memakai ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "margin: auto;",
+      "B": "padding: center;",
+      "C": "text-align: auto;",
+      "D": "border: center;"
+    },
+    "key": "A",
+    "explanation": "margin: auto (atau margin: 0 auto) membuat browser membagi ruang sisa kanan dan kiri secara seimbang sehingga elemen berada di tengah."
+  },
+  {
+    "num": 22,
+    "question": "Kode padding: 10px 20px; berarti ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Semua sisi 10px",
+      "B": "Semua sisi 20px",
+      "C": "Atas-bawah 10px, kiri-kanan 20px",
+      "D": "Atas 20px, bawah 10px saja"
+    },
+    "key": "C",
+    "explanation": "Dengan dua nilai, nilai pertama (10px) berlaku untuk atas-bawah, dan nilai kedua (20px) berlaku untuk kiri-kanan."
+  },
+  {
+    "num": 23,
+    "question": "Fitur di browser yang dipakai untuk melihat Box Model sebuah elemen adalah ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Download",
+      "B": "Inspect",
+      "C": "Print",
+      "D": "Bookmark"
+    },
+    "key": "B",
+    "explanation": "Menu Inspect Element pada Developer Tools peramban menampilkan diagram interaktif Box Model elemen."
+  },
+  {
+    "num": 24,
+    "question": "Property width: 300px; berfungsi untuk mengatur ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Tinggi elemen",
+      "B": "Warna elemen",
+      "C": "Jarak elemen",
+      "D": "Lebar elemen"
+    },
+    "key": "D",
+    "explanation": "Property width digunakan untuk menetapkan ukuran lebar suatu elemen."
+  },
+  {
+    "num": 25,
+    "question": "Kode border-collapse: collapse; pada tabel berfungsi untuk ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Menyatukan garis tepi tabel agar tidak ganda",
+      "B": "Menghapus isi tabel",
+      "C": "Mengubah warna tabel",
+      "D": "Menyembunyikan tabel"
+    },
+    "key": "A",
+    "explanation": "border-collapse: collapse menggabungkan garis batas sel tabel menjadi satu garis rapi tanpa celah ganda."
+  },
+  {
+    "num": 26,
+    "question": "Kode list-style-type: none; pada list akan ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Mengubah bullet jadi angka",
+      "B": "Mengubah bullet jadi kotak",
+      "C": "Menghilangkan bullet",
+      "D": "Menghapus list"
+    },
+    "key": "C",
+    "explanation": "Nilai none pada list-style-type menghilangkan tanda bullet/titik pada daftar list."
+  },
+  {
+    "num": 27,
+    "question": "Selector a:hover dipakai untuk mengatur tampilan link ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Yang sudah dikunjungi",
+      "B": "Saat kursor mouse berada di atasnya",
+      "C": "Saat halaman pertama dibuka",
+      "D": "Yang rusak"
+    },
+    "key": "B",
+    "explanation": "Pseudo-class :hover aktif saat penunjuk mouse berada tepat di atas elemen link tersebut."
+  },
+  {
+    "num": 28,
+    "question": "Kode text-decoration: none; pada tag <a> berfungsi untuk ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Membuat link tebal",
+      "B": "Membuat link miring",
+      "C": "Mengganti warna link",
+      "D": "Menghilangkan garis bawah link"
+    },
+    "key": "D",
+    "explanation": "text-decoration: none menghilangkan garis bawah bawaan pada tautan (link)."
+  },
+  {
+    "num": 29,
+    "question": "Selector tr:nth-child(even) dipakai untuk memilih ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Baris tabel genap",
+      "B": "Baris tabel pertama saja",
+      "C": "Semua kolom",
+      "D": "Baris tabel ganjil"
+    },
+    "key": "A",
+    "explanation": "Kata kunci even pada pseudo-class :nth-child memilih baris dengan indeks urutan genap (2, 4, 6, dst) untuk membuat efek baris belang."
+  },
+  {
+    "num": 30,
+    "question": "Agar sebuah link tampak seperti tombol, kita dapat menambahkan ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Hanya warna teks",
+      "B": "Hanya garis bawah",
+      "C": "Padding, background, dan border-radius",
+      "D": "Hanya ukuran huruf"
+    },
+    "key": "C",
+    "explanation": "Kombinasi padding (ruang dalam), background-color (warna tombol), dan border-radius (sudut melengkung) mengubah tautan tampak seperti tombol nyata."
+  },
+  {
+    "num": 31,
+    "question": "Elemen berikut yang termasuk elemen block adalah ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "<span>",
+      "B": "<div>",
+      "C": "<a>",
+      "D": "<img>"
+    },
+    "key": "B",
+    "explanation": "Tag <div> adalah elemen tipe block yang selalu menempati satu baris penuh dan mendorong elemen berikutnya ke baris baru."
+  },
+  {
+    "num": 32,
+    "question": "Elemen berikut yang termasuk elemen inline adalah ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "<div>",
+      "B": "<p>",
+      "C": "<h1>",
+      "D": "<span>"
+    },
+    "key": "D",
+    "explanation": "Tag <span> adalah elemen inline yang lebarnya hanya sebesar isi konten dan mengalir bersama teks lain."
+  },
+  {
+    "num": 33,
+    "question": "Nilai display: inline-block; membuat elemen ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Berjajar di baris yang sama, tetapi width dan height tetap bisa diatur",
+      "B": "Hilang dari halaman",
+      "C": "Selalu di baris baru",
+      "D": "Tidak bisa diberi warna"
+    },
+    "key": "A",
+    "explanation": "inline-block menggabungkan sifat inline (bisa sejajar ke samping) dengan kemampuan mengatur lebar (width) dan tinggi (height) seperti elemen block."
+  },
+  {
+    "num": 34,
+    "question": "Nilai display: none; berfungsi untuk ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Membuat elemen lebih besar",
+      "B": "Membuat elemen berwarna putih",
+      "C": "Menyembunyikan elemen sepenuhnya",
+      "D": "Membuat elemen berjajar"
+    },
+    "key": "C",
+    "explanation": "display: none menyembunyikan elemen seolah elemen tersebut tidak ada pada halaman web (tidak memakan ruang)."
+  },
+  {
+    "num": 35,
+    "question": "Agar menu navigasi (ul + li) tampil horizontal, li diberi ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "display: none;",
+      "B": "display: inline-block;",
+      "C": "display: hidden;",
+      "D": "display: vertical;"
+    },
+    "key": "B",
+    "explanation": "Dengan memberikan display: inline-block pada elemen li, item navigasi akan berjajar ke samping secara horizontal."
+  },
+  {
+    "num": 36,
+    "question": "Tag semantic yang dipakai untuk bagian kepala (atas) halaman adalah ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "<foot>",
+      "B": "<top>",
+      "C": "<head>",
+      "D": "<header>"
+    },
+    "key": "D",
+    "explanation": "Tag <header> merupakan elemen HTML semantic untuk bagian kepala konten atau pengantar halaman web."
+  },
+  {
+    "num": 37,
+    "question": "Tag semantic yang dipakai untuk bagian paling bawah halaman adalah ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "<footer>",
+      "B": "<nav>",
+      "C": "<main>",
+      "D": "<header>"
+    },
+    "key": "A",
+    "explanation": "Tag <footer> adalah elemen HTML semantic untuk area catatan kaki (kredit, kontak, copyright) di bagian bawah halaman."
+  },
+  {
+    "num": 38,
+    "question": "Pada proyek akhir, jumlah file CSS yang dipakai untuk semua halaman website adalah ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "Satu file untuk setiap halaman",
+      "B": "Dua file",
+      "C": "Satu file (style.css) untuk semua halaman",
+      "D": "Tidak perlu file CSS"
+    },
+    "key": "C",
+    "explanation": "Penggunaan satu file CSS terpusat (style.css) memudahkan pengelolaan gaya secara konsisten di seluruh halaman website."
+  },
+  {
+    "num": 39,
+    "question": "Pada proyek akhir, cara menulis CSS yang TIDAK boleh dipakai adalah ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "External CSS",
+      "B": "Inline CSS (atribut style)",
+      "C": "Komentar CSS",
+      "D": "Selector class"
+    },
+    "key": "B",
+    "explanation": "Inline CSS tidak dianjurkan karena mencampur aduk kode struktur dengan desain dan sulit dirawat."
+  },
+  {
+    "num": 40,
+    "question": "Tag <link> ke file style.css dipasang di bagian ...",
+    "code": "",
+    "lang": "",
+    "options": {
+      "A": "<footer>",
+      "B": "<body>",
+      "C": "<title>",
+      "D": "<head>"
+    },
+    "key": "D",
+    "explanation": "Tag <link rel=\"stylesheet\" href=\"style.css\"> selalu ditempatkan di dalam elemen <head> dokumen HTML."
+  }
+];
+
+// Masukkan soal Web Programming untuk Kelas 7 (Dasar HTML)
+RAW_WEB_MIDTERM.forEach(q => {
+  OFFICIAL_BANK_SOAL.push({
+    id: `web7_mid_${q.num}`,
+    grade: '7',
+    subject: "Web Programming",
+    examType: "Midterm",
+    question: q.question,
+    code: q.code || "",
+    lang: q.lang || "",
+    options: q.options,
+    key: q.key,
+    explanation: q.explanation
+  });
+});
+
+RAW_WEB_FINAL.forEach(q => {
+  OFFICIAL_BANK_SOAL.push({
+    id: `web7_fin_${q.num}`,
+    grade: '7',
+    subject: "Web Programming",
+    examType: "Final",
+    question: q.question,
+    code: q.code || "",
+    lang: q.lang || "",
+    options: q.options,
+    key: q.key,
+    explanation: q.explanation
+  });
+});
+
+// Masukkan soal Resmi Web Programming untuk Kelas 8 (CSS & Box Model)
+RAW_WEB8_MIDTERM.forEach(q => {
+  OFFICIAL_BANK_SOAL.push({
+    id: `web8_mid_${q.num}`,
+    grade: '8',
+    subject: "Web Programming",
+    examType: "Midterm",
+    question: q.question,
+    code: q.code || "",
+    lang: q.lang || "",
+    options: q.options,
+    key: q.key,
+    explanation: q.explanation
+  });
+});
+
+RAW_WEB8_FINAL.forEach(q => {
+  OFFICIAL_BANK_SOAL.push({
+    id: `web8_fin_${q.num}`,
+    grade: '8',
+    subject: "Web Programming",
+    examType: "Final",
+    question: q.question,
+    code: q.code || "",
+    lang: q.lang || "",
+    options: q.options,
+    key: q.key,
+    explanation: q.explanation
   });
 });
 // =========================================================================
